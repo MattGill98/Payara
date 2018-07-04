@@ -10,6 +10,7 @@ import org.glassfish.hk2.external.org.objectweb.asm.ClassReader;
 import fish.payara.microprofile.openapi.api.processor.OASProcessor;
 import fish.payara.microprofile.openapi.impl.config.OpenApiConfiguration;
 import fish.payara.microprofile.openapi.impl.visitor.OpenApiClassVisitor;
+import fish.payara.microprofile.openapi.impl.visitor.VisitorContext;
 
 public class ASMProcessor implements OASProcessor {
 
@@ -30,7 +31,7 @@ public class ASMProcessor implements OASProcessor {
                     e.printStackTrace();
                 }
                 if (reader != null) {
-                    reader.accept(new OpenApiClassVisitor(),
+                    reader.accept(new OpenApiClassVisitor(new VisitorContext(api)),
                             ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
                 }
             }
