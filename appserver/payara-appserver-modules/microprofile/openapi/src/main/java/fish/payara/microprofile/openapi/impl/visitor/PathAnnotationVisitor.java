@@ -1,20 +1,25 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import org.eclipse.microprofile.openapi.models.OpenAPI;
+import java.util.logging.Logger;
 
 public class PathAnnotationVisitor extends OpenApiAnnotationVisitor {
 
-    private final OpenAPI openapi;
+    private static final Logger LOGGER = Logger.getLogger(PathAnnotationVisitor.class.getName());
 
-    public PathAnnotationVisitor(OpenAPI openapi) {
+    private final VisitorContext context;
+
+    private boolean method;
+
+    public PathAnnotationVisitor(VisitorContext context, boolean method) {
         super();
-        this.openapi = openapi;
+        this.context = context;
+        this.method = method;
     }
 
     @Override
     public void visit(String name, Object value) {
         if ("value".equals(name)) {
-            System.out.println("Path found: " + value);
+            context.addPathSegment((String) value, method);
         }
         super.visit(name, value);
     }
