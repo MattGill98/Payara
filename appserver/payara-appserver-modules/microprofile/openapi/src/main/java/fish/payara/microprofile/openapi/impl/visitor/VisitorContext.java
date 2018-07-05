@@ -39,17 +39,18 @@
  */
 package fish.payara.microprofile.openapi.impl.visitor;
 
+import java.util.LinkedList;
+
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
-
-import fish.payara.microprofile.openapi.impl.model.util.ModelUtils;
+import org.eclipse.microprofile.openapi.models.PathItem;
 
 public class VisitorContext {
 
     private final OpenAPI openapi;
 
     // Variables for constructing the path
-    public static String APPLICATION_PATH = "/";
+    private String applicationPath = "/";
     private String classPath;
     private String resourcePath;
 
@@ -59,9 +60,14 @@ public class VisitorContext {
     private Operation workingOperation;
 
     public VisitorContext(OpenAPI openapi) {
+        this(openapi, null);
+    }
+
+    public VisitorContext(OpenAPI openapi, String applicationPath) {
         this.openapi = openapi;
         this.classPath = "";
         this.resourcePath = "";
+        this.applicationPath = applicationPath;
     }
 
     public OpenAPI getApi() {
@@ -69,7 +75,7 @@ public class VisitorContext {
     }
 
     public String getPath() {
-        return ModelUtils.normaliseUrl("/" + APPLICATION_PATH + "/" + classPath + "/" + resourcePath + "/");
+        return normaliseUrl(applicationPath, classPath, resourcePath);
     }
 
     public void addPathSegment(String path, boolean method) {
@@ -77,6 +83,20 @@ public class VisitorContext {
             this.resourcePath = path;
         } else {
             this.classPath = path;
+        }
+    }
+
+    public String getApplicationPath() {
+        return applicationPath;
+    }
+
+    public void setApplicationPath(String applicationPath) {
+        if (this.applicationPath == null) {
+            this.applicationPath = applicationPath;
+            for (String path : new LinkedList<>(openapi.getPaths().keySet())) {
+                PathItem moved = openapi.getPaths().remove(path);
+                openapi.getPaths().addPathItem(normaliseUrl(applicationPath, path), moved);
+            }
         }
     }
 
@@ -114,6 +134,28 @@ public class VisitorContext {
         if (name.endsWith(";"))
             name = name.substring(0, name.length() - 1);
         return name;
+    }
+
+    public static String normaliseUrl(String... urlComponents) {
+        if (urlComponents == null || urlComponents.length == 0) {
+            return "";
+        }
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("/");
+
+        if (urlComponents != null) {
+            for (String component : urlComponents) {
+                if (component != null) {
+                    urlBuilder.append(component);
+                }
+                urlBuilder.append("/");
+            }
+        }
+
+        // Remove trailing slash
+        urlBuilder.deleteCharAt(urlBuilder.length() - 1);
+
+        return urlBuilder.toString().replaceAll("/+", "/");
     }
 
 }

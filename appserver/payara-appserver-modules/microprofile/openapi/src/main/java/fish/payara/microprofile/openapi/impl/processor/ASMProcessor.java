@@ -22,6 +22,9 @@ public class ASMProcessor implements OASProcessor {
 
     @Override
     public OpenAPI process(OpenAPI api, OpenApiConfiguration config) {
+
+        String applicationPath = null;
+
         for (String entry : Collections.list(archive.entries())) {
             if (entry.endsWith(".class")) {
                 ClassReader reader = null;
@@ -31,8 +34,10 @@ public class ASMProcessor implements OASProcessor {
                     e.printStackTrace();
                 }
                 if (reader != null) {
-                    reader.accept(new OpenApiClassVisitor(new VisitorContext(api)),
+                    VisitorContext context = new VisitorContext(api, applicationPath);
+                    reader.accept(new OpenApiClassVisitor(context),
                             ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+                    applicationPath = context.getApplicationPath();
                 }
             }
         }
