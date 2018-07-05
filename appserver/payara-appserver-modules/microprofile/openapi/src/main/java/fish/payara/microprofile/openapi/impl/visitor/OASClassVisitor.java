@@ -22,6 +22,8 @@ public final class OASClassVisitor extends ClassVisitor {
 
     private final OASContext context;
 
+    private String className;
+
     public OASClassVisitor(OASContext context) {
         super(Opcodes.ASM5);
         this.context = context;
@@ -29,8 +31,8 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        context.setClassName(getClassName(name));
-        LOGGER.log(Level.INFO, "Entering class: " + context.getClassName());
+        this.className = name;
+        LOGGER.log(Level.INFO, "Entering class: " + name);
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
@@ -60,8 +62,7 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        LOGGER.log(Level.INFO, "Leaving class: " + context.getClassName());
-        context.clearClassName();
+        LOGGER.log(Level.INFO, "Leaving class: " + className);
         super.visitEnd();
     }
 

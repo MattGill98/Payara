@@ -54,7 +54,6 @@ public class OASContext {
     private String classPath;
     private String resourcePath;
 
-    private String className;
     private String annotationName;
 
     private String operationMethod;
@@ -111,18 +110,6 @@ public class OASContext {
 
     public void clearAnnotationName() {
         setAnnotationName(null);
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public void clearClassName() {
-        setClassName(null);
     }
 
     public boolean isOperationValid() {
