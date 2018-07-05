@@ -39,6 +39,7 @@
  */
 package fish.payara.microprofile.openapi.impl.model.responses;
 
+import static fish.payara.microprofile.openapi.impl.model.util.ModelUtils.UNKNOWN_ELEMENT_NAME;
 import static fish.payara.microprofile.openapi.impl.model.util.ModelUtils.isAnnotationNull;
 
 import java.util.Map;
@@ -65,6 +66,9 @@ public class APIResponsesImpl extends ExtensibleTreeMap<APIResponse, APIResponse
     @Override
     public APIResponses addAPIResponse(String name, APIResponse apiResponse) {
         if (apiResponse != null) {
+            if (name == null || name.isEmpty()) {
+                name = UNKNOWN_ELEMENT_NAME;
+            }
             put(name, apiResponse);
         }
         return this;

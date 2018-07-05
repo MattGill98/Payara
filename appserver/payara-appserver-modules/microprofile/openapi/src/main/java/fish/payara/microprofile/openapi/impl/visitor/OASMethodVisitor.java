@@ -35,6 +35,8 @@ public final class OASMethodVisitor extends MethodVisitor {
                 case "javax.ws.rs.HEAD":
                 case "javax.ws.rs.TRACE":
                     return new HttpMethodOASAnnotationVisitor(context);
+                case "javax.ws.rs.Produces":
+                    return new ProducesOASAnnotationVisitor(context);
             }
         }
 
