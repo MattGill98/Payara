@@ -46,6 +46,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.eclipse.microprofile.openapi.models.Components;
 import org.eclipse.microprofile.openapi.models.Paths;
 import org.eclipse.microprofile.openapi.models.security.SecurityRequirement;
 
@@ -68,5 +69,8 @@ public interface ExtensionsMixin {
 
     @JsonInclude(Include.ALWAYS)
     public abstract Paths getPaths();
+
+    @JsonInclude(value = Include.CUSTOM, valueFilter = ComponentsFilter.class)
+    public abstract Components getComponents();
 
 }
