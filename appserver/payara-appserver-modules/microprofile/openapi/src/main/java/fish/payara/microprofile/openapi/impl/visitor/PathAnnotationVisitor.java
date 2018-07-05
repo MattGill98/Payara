@@ -2,13 +2,10 @@ package fish.payara.microprofile.openapi.impl.visitor;
 
 public class PathAnnotationVisitor extends OpenApiAnnotationVisitor {
 
-    private final VisitorContext context;
-
     private boolean method;
 
     public PathAnnotationVisitor(VisitorContext context, boolean method) {
-        super();
-        this.context = context;
+        super(context);
         this.method = method;
     }
 
