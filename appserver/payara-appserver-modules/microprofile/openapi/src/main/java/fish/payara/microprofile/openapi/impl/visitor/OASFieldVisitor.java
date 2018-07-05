@@ -4,9 +4,9 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Opcodes;
 
-public final class OpenApiFieldVisitor extends FieldVisitor {
+public final class OASFieldVisitor extends FieldVisitor {
 
-    public OpenApiFieldVisitor() {
+    public OASFieldVisitor() {
         super(Opcodes.ASM5);
     }
 
