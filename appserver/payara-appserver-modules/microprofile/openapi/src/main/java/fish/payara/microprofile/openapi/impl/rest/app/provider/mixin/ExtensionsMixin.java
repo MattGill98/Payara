@@ -48,9 +48,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.eclipse.microprofile.openapi.models.Components;
 import org.eclipse.microprofile.openapi.models.Operation;
-import org.eclipse.microprofile.openapi.models.Paths;
 import org.eclipse.microprofile.openapi.models.PathItem.HttpMethod;
+import org.eclipse.microprofile.openapi.models.Paths;
 import org.eclipse.microprofile.openapi.models.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.models.servers.ServerVariable;
 import org.eclipse.microprofile.openapi.models.servers.ServerVariables;
@@ -86,5 +87,8 @@ public interface ExtensionsMixin {
 
     @JsonProperty("variables")
     void setVariables(Map<String, ServerVariable> variables);
+
+    @JsonInclude(value = Include.CUSTOM, valueFilter = ComponentsFilter.class)
+    public abstract Components getComponents();
 
 }
