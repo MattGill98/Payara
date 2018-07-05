@@ -44,6 +44,7 @@ import java.util.LinkedList;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
+import org.eclipse.microprofile.openapi.models.PathItem.HttpMethod;
 
 public class VisitorContext {
 
@@ -56,7 +57,9 @@ public class VisitorContext {
 
     private String className;
     private String methodName;
+    private String annotationName;
 
+    private HttpMethod operationMethod;
     private Operation workingOperation;
 
     public VisitorContext(OpenAPI openapi) {
@@ -100,12 +103,28 @@ public class VisitorContext {
         }
     }
 
+    public String getAnnotationName() {
+        return annotationName;
+    }
+
+    public void setAnnotationName(String annotationName) {
+        this.annotationName = annotationName;
+    }
+
+    public void clearAnnotationName() {
+        setAnnotationName(null);
+    }
+
     public String getMethodName() {
         return methodName;
     }
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    public void clearMethodName() {
+        setMethodName(null);
     }
 
     public String getClassName() {
@@ -116,12 +135,25 @@ public class VisitorContext {
         this.className = className;
     }
 
+    public void clearClassName() {
+        setClassName(null);
+    }
+
+    public HttpMethod getOperationMethod() {
+        return operationMethod;
+    }
+
     public Operation getWorkingOperation() {
         return workingOperation;
     }
 
-    public void setWorkingOperation(Operation workingOperation) {
+    public void setWorkingOperation(Operation workingOperation, HttpMethod operationMethod) {
         this.workingOperation = workingOperation;
+        this.operationMethod = operationMethod;
+    }
+
+    public void clearWorkingOperation() {
+        setWorkingOperation(null, null);
     }
 
     public static String getClassName(String name) {

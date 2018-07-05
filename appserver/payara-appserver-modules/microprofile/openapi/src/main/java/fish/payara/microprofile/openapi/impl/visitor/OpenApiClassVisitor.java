@@ -34,6 +34,7 @@ public final class OpenApiClassVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        context.setAnnotationName(getClassName(desc));
 
         if (ApplicationPath.class.getName().equals(getClassName(desc))) {
             return new ApplicationPathAnnotationVisitor(context);
@@ -58,7 +59,7 @@ public final class OpenApiClassVisitor extends ClassVisitor {
     @Override
     public void visitEnd() {
         LOGGER.log(Level.INFO, "Leaving class: " + context.getClassName());
-        context.setClassName(null);
+        context.clearClassName();
         super.visitEnd();
     }
 
