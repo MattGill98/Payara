@@ -49,7 +49,7 @@ public class VisitorContext implements ApiContext {
 
     private final OpenAPI openapi;
 
-    private String applicationPath;
+    public static String APPLICATION_PATH = "/";
     private String classPath;
     private String resourcePath;
 
@@ -57,7 +57,6 @@ public class VisitorContext implements ApiContext {
 
     public VisitorContext(OpenAPI openapi) {
         this.openapi = openapi;
-        this.applicationPath = "!!!APPLICATION_PATH!!!";
         this.classPath = "";
         this.resourcePath = "";
     }
@@ -69,17 +68,7 @@ public class VisitorContext implements ApiContext {
 
     @Override
     public String getPath() {
-        return ModelUtils.normaliseUrl("/" + applicationPath + "/" + classPath + "/" + resourcePath + "/");
-    }
-
-    public void setApplicationPath(String path) {
-        String discoveredApplicationPath = path;
-        for (String oldPath : openapi.getPaths().keySet()) {
-            if (oldPath.contains(applicationPath)) {
-                oldPath = oldPath.replace(applicationPath, discoveredApplicationPath);
-            }
-        }
-        this.applicationPath = discoveredApplicationPath;
+        return ModelUtils.normaliseUrl("/" + APPLICATION_PATH + "/" + classPath + "/" + resourcePath + "/");
     }
 
     public void addPathSegment(String path, boolean method) {
@@ -95,7 +84,14 @@ public class VisitorContext implements ApiContext {
         return workingOperation;
     }
 
+    public void setWorkingOperation(Operation workingOperation) {
+        this.workingOperation = workingOperation;
+    }
+
     public static String getClassName(String name) {
+        if (name == null) {
+            return "";
+        }
         name = name.replace("/", ".");
         if (name.startsWith("L"))
             name = name.substring(1);
