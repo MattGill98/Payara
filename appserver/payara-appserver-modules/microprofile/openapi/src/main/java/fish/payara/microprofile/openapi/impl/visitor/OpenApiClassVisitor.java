@@ -19,7 +19,9 @@ public final class OpenApiClassVisitor extends ClassVisitor {
     private static final Logger LOGGER = Logger.getLogger(OpenApiClassVisitor.class.getName());
 
     private final VisitorContext context;
-    private String className;
+
+    public static String CLASS_NAME;
+    public static String METHOD_NAME;
 
     public OpenApiClassVisitor(VisitorContext context) {
         super(Opcodes.ASM5);
@@ -28,8 +30,8 @@ public final class OpenApiClassVisitor extends ClassVisitor {
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        this.className = getClassName(name);
-        LOGGER.log(Level.INFO, "Entering class: " + className);
+        CLASS_NAME = getClassName(name);
+        LOGGER.log(Level.INFO, "Entering class: " + CLASS_NAME);
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
@@ -52,12 +54,13 @@ public final class OpenApiClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        METHOD_NAME = name;
         return new OpenApiMethodVisitor(context);
     }
 
     @Override
     public void visitEnd() {
-        LOGGER.log(Level.INFO, "Leaving class: " + className);
+        LOGGER.log(Level.INFO, "Leaving class: " + CLASS_NAME);
         super.visitEnd();
     }
 
