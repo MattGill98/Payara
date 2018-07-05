@@ -44,7 +44,6 @@ import java.util.LinkedList;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
-import org.eclipse.microprofile.openapi.models.PathItem.HttpMethod;
 
 public class VisitorContext {
 
@@ -59,7 +58,7 @@ public class VisitorContext {
     private String methodName;
     private String annotationName;
 
-    private HttpMethod operationMethod;
+    private String operationMethod;
     private Operation workingOperation;
 
     public VisitorContext(OpenAPI openapi) {
@@ -139,7 +138,7 @@ public class VisitorContext {
         setClassName(null);
     }
 
-    public HttpMethod getOperationMethod() {
+    public String getOperationMethod() {
         return operationMethod;
     }
 
@@ -147,7 +146,7 @@ public class VisitorContext {
         return workingOperation;
     }
 
-    public void setWorkingOperation(Operation workingOperation, HttpMethod operationMethod) {
+    public void setWorkingOperation(Operation workingOperation, String operationMethod) {
         this.workingOperation = workingOperation;
         this.operationMethod = operationMethod;
     }
