@@ -43,7 +43,7 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitEnd() {
-        if (context.getWorkingOperation() != null) {
+        if (context.isOperationValid()) {
             PathItem pathItem = context.getApi().getPaths().get(context.getPath());
             if (pathItem == null) {
                 pathItem = new PathItemImpl();
@@ -51,26 +51,25 @@ public final class OASMethodVisitor extends MethodVisitor {
             }
             switch (context.getOperationMethod()) {
                 case "javax.ws.rs.GET":
-                    pathItem.GET(context.getWorkingOperation()); break;
+                    pathItem.GET(context.getCurrentOperation()); break;
                 case "javax.ws.rs.POST":
-                    pathItem.POST(context.getWorkingOperation()); break;
+                    pathItem.POST(context.getCurrentOperation()); break;
                 case "javax.ws.rs.PUT":
-                    pathItem.PUT(context.getWorkingOperation()); break;
+                    pathItem.PUT(context.getCurrentOperation()); break;
                 case "javax.ws.rs.DELETE":
-                    pathItem.DELETE(context.getWorkingOperation()); break;
+                    pathItem.DELETE(context.getCurrentOperation()); break;
                 case "javax.ws.rs.PATCH":
-                    pathItem.PATCH(context.getWorkingOperation()); break;
+                    pathItem.PATCH(context.getCurrentOperation()); break;
                 case "javax.ws.rs.OPTIONS":
-                    pathItem.OPTIONS(context.getWorkingOperation()); break;
+                    pathItem.OPTIONS(context.getCurrentOperation()); break;
                 case "javax.ws.rs.HEAD":
-                    pathItem.HEAD(context.getWorkingOperation()); break;
+                    pathItem.HEAD(context.getCurrentOperation()); break;
                 case "javax.ws.rs.TRACE":
-                    pathItem.TRACE(context.getWorkingOperation()); break;
+                    pathItem.TRACE(context.getCurrentOperation()); break;
             }
         }
 
         context.clearWorkingOperation();
-        context.clearMethodName();
         super.visitEnd();
     }
 }

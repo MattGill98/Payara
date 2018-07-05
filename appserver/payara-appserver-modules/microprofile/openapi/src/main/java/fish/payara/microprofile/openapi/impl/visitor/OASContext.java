@@ -55,11 +55,10 @@ public class OASContext {
     private String resourcePath;
 
     private String className;
-    private String methodName;
     private String annotationName;
 
     private String operationMethod;
-    private Operation workingOperation;
+    private Operation currentOperation;
 
     public OASContext(OpenAPI openapi) {
         this(openapi, null);
@@ -114,18 +113,6 @@ public class OASContext {
         setAnnotationName(null);
     }
 
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
-    }
-
-    public void clearMethodName() {
-        setMethodName(null);
-    }
-
     public String getClassName() {
         return className;
     }
@@ -138,21 +125,29 @@ public class OASContext {
         setClassName(null);
     }
 
+    public boolean isOperationValid() {
+        return getOperationMethod() != null && getCurrentOperation() != null;
+    }
+
     public String getOperationMethod() {
         return operationMethod;
     }
 
-    public Operation getWorkingOperation() {
-        return workingOperation;
+    public Operation getCurrentOperation() {
+        return currentOperation;
     }
 
-    public void setWorkingOperation(Operation workingOperation, String operationMethod) {
-        this.workingOperation = workingOperation;
+    public void setCurrentOperation(Operation currentOperation) {
+        this.currentOperation = currentOperation;
+    }
+
+    public void setOperationMethod(String operationMethod) {
         this.operationMethod = operationMethod;
     }
 
     public void clearWorkingOperation() {
-        setWorkingOperation(null, null);
+        setCurrentOperation(null);
+        setOperationMethod(null);
     }
 
     public static String getClassName(String name) {

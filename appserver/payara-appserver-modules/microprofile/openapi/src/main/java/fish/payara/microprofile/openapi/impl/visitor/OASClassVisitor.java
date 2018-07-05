@@ -14,6 +14,8 @@ import org.glassfish.hk2.external.org.objectweb.asm.FieldVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
+import fish.payara.microprofile.openapi.impl.model.OperationImpl;
+
 public final class OASClassVisitor extends ClassVisitor {
 
     private static final Logger LOGGER = Logger.getLogger(OASClassVisitor.class.getName());
@@ -52,7 +54,7 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        context.setMethodName(name);
+        context.setCurrentOperation(new OperationImpl().operationId(name));
         return new OASMethodVisitor(context);
     }
 
