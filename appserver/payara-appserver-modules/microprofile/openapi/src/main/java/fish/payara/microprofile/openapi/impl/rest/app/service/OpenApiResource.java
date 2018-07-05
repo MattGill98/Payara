@@ -93,4 +93,33 @@ public class OpenApiResource {
         // Return the document
         return Response.ok(document).build();
     }
+
+    @GET
+    @Path("/test")
+    @Produces({ APPLICATION_YAML, APPLICATION_JSON })
+    public Response getNewResponse(@Context HttpServletResponse response) throws IOException {
+
+        // If the server is disabled, throw an error
+        if (!OpenApiService.getInstance().isEnabled()) {
+            response.sendError(FORBIDDEN.getStatusCode(), "OpenAPI Service is disabled.");
+            return Response.status(FORBIDDEN).build();
+        }
+
+        // Get the OpenAPI document
+        OpenAPI document = null;
+        try {
+            document = OpenApiService.getInstance().getNewDocument();
+        } catch (OpenAPIBuildException ex) {
+            LOGGER.log(WARNING, "OpenAPI document creation failed.", ex);
+        }
+
+        // If there are none, return an empty OpenAPI document
+        if (document == null) {
+            LOGGER.info("No OpenAPI document found.");
+            return Response.status(Status.NOT_FOUND).entity(new OpenAPIImpl()).build();
+        }
+
+        // Return the document
+        return Response.ok(document).build();
+    }
 }

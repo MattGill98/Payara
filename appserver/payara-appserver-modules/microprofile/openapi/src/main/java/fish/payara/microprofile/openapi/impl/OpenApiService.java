@@ -39,17 +39,9 @@
  */
 package fish.payara.microprofile.openapi.impl;
 
-import com.sun.enterprise.v3.services.impl.GrizzlyService;
-import fish.payara.microprofile.openapi.api.OpenAPIBuildException;
-import fish.payara.microprofile.openapi.impl.admin.OpenApiServiceConfiguration;
-import fish.payara.microprofile.openapi.impl.config.OpenApiConfiguration;
-import fish.payara.microprofile.openapi.impl.model.OpenAPIImpl;
-import fish.payara.microprofile.openapi.impl.processor.ApplicationProcessor;
-import fish.payara.microprofile.openapi.impl.processor.BaseProcessor;
-import fish.payara.microprofile.openapi.impl.processor.FileProcessor;
-import fish.payara.microprofile.openapi.impl.processor.FilterProcessor;
-import fish.payara.microprofile.openapi.impl.processor.ModelReaderProcessor;
-import fish.payara.nucleus.executorservice.PayaraExecutorService;
+import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toSet;
+
 import java.beans.PropertyChangeEvent;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -62,10 +54,12 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
-import static java.util.stream.Collectors.toSet;
+
 import javax.inject.Inject;
+
+import com.sun.enterprise.v3.services.impl.GrizzlyService;
+
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.glassfish.api.StartupRunLevel;
 import org.glassfish.api.admin.ServerEnvironment;
@@ -91,6 +85,18 @@ import org.jvnet.hk2.config.ConfigSupport;
 import org.jvnet.hk2.config.NotProcessed;
 import org.jvnet.hk2.config.UnprocessedChangeEvents;
 
+import fish.payara.microprofile.openapi.api.OpenAPIBuildException;
+import fish.payara.microprofile.openapi.impl.admin.OpenApiServiceConfiguration;
+import fish.payara.microprofile.openapi.impl.config.OpenApiConfiguration;
+import fish.payara.microprofile.openapi.impl.model.OpenAPIImpl;
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
+import fish.payara.microprofile.openapi.impl.processor.ApplicationProcessor;
+import fish.payara.microprofile.openapi.impl.processor.BaseProcessor;
+import fish.payara.microprofile.openapi.impl.processor.FileProcessor;
+import fish.payara.microprofile.openapi.impl.processor.FilterProcessor;
+import fish.payara.microprofile.openapi.impl.processor.ModelReaderProcessor;
+import fish.payara.nucleus.executorservice.PayaraExecutorService;
+
 @Service(name = "microprofile-openapi-service")
 @RunLevel(StartupRunLevel.VAL)
 public class OpenApiService implements PostConstruct, PreDestroy, EventListener, ConfigListener {
@@ -98,6 +104,8 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
     private static final Logger LOGGER = Logger.getLogger(OpenApiService.class.getName());
 
     private Deque<OpenApiMapping> mappings;
+
+    private Deque<OpenApiMapping> newMappings;
 
     @Inject
     private Events events;
@@ -117,6 +125,7 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
     @Override
     public void postConstruct() {
         mappings = new ConcurrentLinkedDeque<>();
+        newMappings = new ConcurrentLinkedDeque<>();
         events.register(this);
     }
 
@@ -163,7 +172,8 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
             // Create all the relevant resources
             if (isValidApp(appInfo)) {
                 // Store the application mapping in the list
-                mappings.add(new OpenApiMapping(appInfo));
+                mappings.add(new OpenApiMapping(appInfo, false));
+                newMappings.add(new OpenApiMapping(appInfo, true));
             }
         } else if (event.is(Deployment.APPLICATION_UNLOADED)) {
             ApplicationInfo appInfo = (ApplicationInfo) event.hook();
@@ -186,6 +196,13 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
             return null;
         }
         return (OpenAPI) mappings.peekLast().getDocument();
+    }
+
+    public OpenAPI getNewDocument() throws OpenAPIBuildException {
+        if (newMappings.isEmpty() || !isEnabled()) {
+            return null;
+        }
+        return (OpenAPI) newMappings.peekLast().getDocument();
     }
 
     /**
@@ -258,9 +275,12 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
         private final OpenApiConfiguration appConfig;
         private volatile OpenAPI document;
 
-        private OpenApiMapping(ApplicationInfo appInfo) {
+        private final boolean newDocument;
+
+        private OpenApiMapping(ApplicationInfo appInfo, boolean newDocument) {
             this.appInfo = appInfo;
             this.appConfig = new OpenApiConfiguration(appInfo.getAppClassLoader());
+            this.newDocument = newDocument;
         }
 
         private ApplicationInfo getAppInfo() {
@@ -268,7 +288,7 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
         }
 
         private synchronized OpenAPI getDocument() throws OpenAPIBuildException {
-            if (document == null) {
+            if (document == null || newDocument) {
                 document = buildDocument();
             }
             return document;
@@ -281,11 +301,15 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
                 String contextRoot = getContextRoot(appInfo);
                 List<URL> baseURLs = getServerURL(contextRoot);
                 ReadableArchive archive = appInfo.getSource();
-                Set<Class<?>> classes = getClassesFromArchive(archive, appInfo.getAppClassLoader());
 
                 openapi = new ModelReaderProcessor().process(openapi, appConfig);
                 openapi = new FileProcessor(appInfo.getAppClassLoader()).process(openapi, appConfig);
-                openapi = new ApplicationProcessor(classes).process(openapi, appConfig);
+                if (newDocument) {
+                    openapi = new ASMProcessor(archive).process(openapi, appConfig);
+                } else {
+                    Set<Class<?>> classes = getClassesFromArchive(archive, appInfo.getAppClassLoader());
+                    openapi = new ApplicationProcessor(classes).process(openapi, appConfig);
+                }
                 openapi = new BaseProcessor(baseURLs).process(openapi, appConfig);
                 openapi = new FilterProcessor().process(openapi, appConfig);
             } catch (Throwable t) {
