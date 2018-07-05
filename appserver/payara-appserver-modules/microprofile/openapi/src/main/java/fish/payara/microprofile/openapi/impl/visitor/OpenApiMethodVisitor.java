@@ -9,14 +9,11 @@ import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
-import fish.payara.microprofile.openapi.impl.model.OperationImpl;
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
 
 public final class OpenApiMethodVisitor extends MethodVisitor {
 
     private final VisitorContext context;
-
-    public static String METHOD_NAME;
 
     public OpenApiMethodVisitor(VisitorContext context) {
         super(Opcodes.ASM5);
@@ -39,11 +36,12 @@ public final class OpenApiMethodVisitor extends MethodVisitor {
     @Override
     public void visitEnd() {
         if (context.getWorkingOperation() != null) {
-            context.getApi().getPaths().addPathItem(context.getPath(), new PathItemImpl().GET(new OperationImpl().operationId(OpenApiClassVisitor.METHOD_NAME)));
+            context.getApi().getPaths().addPathItem(context.getPath(),
+                    new PathItemImpl().GET(context.getWorkingOperation()));
         }
-        context.setWorkingOperation(null);
 
-        OpenApiClassVisitor.METHOD_NAME = null;
+        context.setWorkingOperation(null);
+        context.setMethodName(null);
         super.visitEnd();
     }
 }
