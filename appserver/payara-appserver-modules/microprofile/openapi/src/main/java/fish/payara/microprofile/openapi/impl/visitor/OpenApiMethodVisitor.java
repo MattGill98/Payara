@@ -50,21 +50,21 @@ public final class OpenApiMethodVisitor extends MethodVisitor {
                 context.getApi().getPaths().addPathItem(context.getPath(), pathItem);
             }
             switch (context.getOperationMethod()) {
-                case GET:
+                case "javax.ws.rs.GET":
                     pathItem.GET(context.getWorkingOperation()); break;
-                case POST:
+                case "javax.ws.rs.POST":
                     pathItem.POST(context.getWorkingOperation()); break;
-                case PUT:
+                case "javax.ws.rs.PUT":
                     pathItem.PUT(context.getWorkingOperation()); break;
-                case DELETE:
+                case "javax.ws.rs.DELETE":
                     pathItem.DELETE(context.getWorkingOperation()); break;
-                case PATCH:
+                case "javax.ws.rs.PATCH":
                     pathItem.PATCH(context.getWorkingOperation()); break;
-                case OPTIONS:
+                case "javax.ws.rs.OPTIONS":
                     pathItem.OPTIONS(context.getWorkingOperation()); break;
-                case HEAD:
+                case "javax.ws.rs.HEAD":
                     pathItem.HEAD(context.getWorkingOperation()); break;
-                case TRACE:
+                case "javax.ws.rs.TRACE":
                     pathItem.TRACE(context.getWorkingOperation()); break;
             }
         }
