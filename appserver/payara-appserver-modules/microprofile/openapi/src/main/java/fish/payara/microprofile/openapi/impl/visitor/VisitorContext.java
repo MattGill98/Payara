@@ -42,16 +42,19 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 
-import fish.payara.microprofile.openapi.api.visitor.ApiContext;
 import fish.payara.microprofile.openapi.impl.model.util.ModelUtils;
 
-public class VisitorContext implements ApiContext {
+public class VisitorContext {
 
     private final OpenAPI openapi;
 
+    // Variables for constructing the path
     public static String APPLICATION_PATH = "/";
     private String classPath;
     private String resourcePath;
+
+    private String className;
+    private String methodName;
 
     private Operation workingOperation;
 
@@ -61,12 +64,10 @@ public class VisitorContext implements ApiContext {
         this.resourcePath = "";
     }
 
-    @Override
     public OpenAPI getApi() {
         return openapi;
     }
 
-    @Override
     public String getPath() {
         return ModelUtils.normaliseUrl("/" + APPLICATION_PATH + "/" + classPath + "/" + resourcePath + "/");
     }
@@ -79,7 +80,22 @@ public class VisitorContext implements ApiContext {
         }
     }
 
-    @Override
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
     public Operation getWorkingOperation() {
         return workingOperation;
     }

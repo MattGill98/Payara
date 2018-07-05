@@ -18,7 +18,7 @@ public class HttpMethodAnnotationVisitor extends OpenApiAnnotationVisitor {
 
     @Override
     public void visitEnd() {
-        context.setWorkingOperation(new OperationImpl().operationId(OpenApiClassVisitor.METHOD_NAME));
+        context.setWorkingOperation(new OperationImpl().operationId(context.getMethodName()));
         LOGGER.log(Level.INFO, "Path found: " + context.getPath());
     }
 

@@ -1,10 +1,6 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import java.util.logging.Logger;
-
 public class PathAnnotationVisitor extends OpenApiAnnotationVisitor {
-
-    private static final Logger LOGGER = Logger.getLogger(PathAnnotationVisitor.class.getName());
 
     private final VisitorContext context;
 
