@@ -39,6 +39,7 @@
  */
 package fish.payara.microprofile.openapi.impl.model.responses;
 
+import static fish.payara.microprofile.openapi.impl.model.util.ModelUtils.UNKNOWN_ELEMENT_NAME;
 import static fish.payara.microprofile.openapi.impl.model.util.ModelUtils.isAnnotationNull;
 
 import java.util.LinkedHashMap;
@@ -54,6 +55,9 @@ public class APIResponsesImpl extends LinkedHashMap<String, APIResponse> impleme
 
 	@Override
     public APIResponses addApiResponse(String name, APIResponse item) {
+        if (name == null || name.isEmpty()) {
+            name = UNKNOWN_ELEMENT_NAME;
+        }
         put(name, item);
         return this;
     }
