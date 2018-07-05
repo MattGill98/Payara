@@ -1,6 +1,6 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import static fish.payara.microprofile.openapi.impl.visitor.VisitorContext.getClassName;
+import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
@@ -9,11 +9,11 @@ import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
 
-public final class OpenApiMethodVisitor extends MethodVisitor {
+public final class OASMethodVisitor extends MethodVisitor {
 
-    private final VisitorContext context;
+    private final OASContext context;
 
-    public OpenApiMethodVisitor(VisitorContext context) {
+    public OASMethodVisitor(OASContext context) {
         super(Opcodes.ASM5);
         this.context = context;
     }
@@ -25,7 +25,7 @@ public final class OpenApiMethodVisitor extends MethodVisitor {
         if (desc != null) {
             switch (getClassName(desc)) {
                 case "javax.ws.rs.Path":
-                    return new PathAnnotationVisitor(context, true);
+                    return new PathOASAnnotationVisitor(context, true);
                 case "javax.ws.rs.GET":
                 case "javax.ws.rs.POST":
                 case "javax.ws.rs.PUT":
@@ -34,7 +34,7 @@ public final class OpenApiMethodVisitor extends MethodVisitor {
                 case "javax.ws.rs.OPTIONS":
                 case "javax.ws.rs.HEAD":
                 case "javax.ws.rs.TRACE":
-                    return new HttpMethodAnnotationVisitor(context);
+                    return new HttpMethodOASAnnotationVisitor(context);
             }
         }
 

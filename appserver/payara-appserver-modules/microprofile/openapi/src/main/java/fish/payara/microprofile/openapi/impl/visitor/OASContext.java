@@ -45,7 +45,7 @@ import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
 
-public class VisitorContext {
+public class OASContext {
 
     private final OpenAPI openapi;
 
@@ -61,11 +61,11 @@ public class VisitorContext {
     private String operationMethod;
     private Operation workingOperation;
 
-    public VisitorContext(OpenAPI openapi) {
+    public OASContext(OpenAPI openapi) {
         this(openapi, null);
     }
 
-    public VisitorContext(OpenAPI openapi, String applicationPath) {
+    public OASContext(OpenAPI openapi, String applicationPath) {
         this.openapi = openapi;
         this.classPath = "";
         this.resourcePath = "";

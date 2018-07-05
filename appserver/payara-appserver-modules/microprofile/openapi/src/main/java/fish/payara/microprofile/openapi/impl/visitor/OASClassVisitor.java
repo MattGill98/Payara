@@ -1,6 +1,6 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import static fish.payara.microprofile.openapi.impl.visitor.VisitorContext.getClassName;
+import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,13 +14,13 @@ import org.glassfish.hk2.external.org.objectweb.asm.FieldVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
-public final class OpenApiClassVisitor extends ClassVisitor {
+public final class OASClassVisitor extends ClassVisitor {
 
-    private static final Logger LOGGER = Logger.getLogger(OpenApiClassVisitor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(OASClassVisitor.class.getName());
 
-    private final VisitorContext context;
+    private final OASContext context;
 
-    public OpenApiClassVisitor(VisitorContext context) {
+    public OASClassVisitor(OASContext context) {
         super(Opcodes.ASM5);
         this.context = context;
     }
@@ -37,9 +37,9 @@ public final class OpenApiClassVisitor extends ClassVisitor {
         context.setAnnotationName(getClassName(desc));
 
         if (ApplicationPath.class.getName().equals(getClassName(desc))) {
-            return new ApplicationPathAnnotationVisitor(context);
+            return new ApplicationPathOASAnnotationVisitor(context);
         } else if (Path.class.getName().equals(getClassName(desc))) {
-            return new PathAnnotationVisitor(context, false);
+            return new PathOASAnnotationVisitor(context, false);
         }
 
         return super.visitAnnotation(desc, visible);
@@ -47,13 +47,13 @@ public final class OpenApiClassVisitor extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-        return new OpenApiFieldVisitor();
+        return new OASFieldVisitor();
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         context.setMethodName(name);
-        return new OpenApiMethodVisitor(context);
+        return new OASMethodVisitor(context);
     }
 
     @Override

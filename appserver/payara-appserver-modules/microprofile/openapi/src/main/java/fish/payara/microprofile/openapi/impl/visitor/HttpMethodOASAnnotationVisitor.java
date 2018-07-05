@@ -5,11 +5,11 @@ import java.util.logging.Logger;
 
 import fish.payara.microprofile.openapi.impl.model.OperationImpl;
 
-public class HttpMethodAnnotationVisitor extends OpenApiAnnotationVisitor {
+public class HttpMethodOASAnnotationVisitor extends OASAnnotationVisitor {
 
-    private static final Logger LOGGER = Logger.getLogger(HttpMethodAnnotationVisitor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HttpMethodOASAnnotationVisitor.class.getName());
 
-    public HttpMethodAnnotationVisitor(VisitorContext context) {
+    public HttpMethodOASAnnotationVisitor(OASContext context) {
         super(context);
     }
 

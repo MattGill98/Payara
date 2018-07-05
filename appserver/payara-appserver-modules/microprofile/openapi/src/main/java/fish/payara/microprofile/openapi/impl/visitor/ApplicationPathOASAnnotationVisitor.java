@@ -1,8 +1,8 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-public class ApplicationPathAnnotationVisitor extends OpenApiAnnotationVisitor {
+public class ApplicationPathOASAnnotationVisitor extends OASAnnotationVisitor {
 
-    public ApplicationPathAnnotationVisitor(VisitorContext context) {
+    public ApplicationPathOASAnnotationVisitor(OASContext context) {
         super(context);
     }
 

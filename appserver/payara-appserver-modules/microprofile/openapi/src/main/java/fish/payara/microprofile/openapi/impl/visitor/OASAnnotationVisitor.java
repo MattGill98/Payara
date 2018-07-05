@@ -3,11 +3,11 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
-public abstract class OpenApiAnnotationVisitor extends AnnotationVisitor {
+public abstract class OASAnnotationVisitor extends AnnotationVisitor {
 
-    protected final VisitorContext context;
+    protected final OASContext context;
 
-    public OpenApiAnnotationVisitor(VisitorContext context) {
+    public OASAnnotationVisitor(OASContext context) {
         super(Opcodes.ASM5);
         this.context = context;
     }
