@@ -3,6 +3,7 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.microprofile.openapi.models.responses.APIResponse;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 
 import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
@@ -17,7 +18,7 @@ public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
 
     @Override
     public void visit(String name, Object value) {
-        if (name == null && value != null) {
+        if (name == null && value != null && value.toString().isEmpty()) {
             producesTypes.add((String) value);
         }
         super.visit(name, value);
@@ -30,8 +31,13 @@ public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
 
     @Override
     public void visitEnd() {
-        context.getCurrentOperation().getResponses().addApiResponse(producesTypes.isEmpty() ? null : producesTypes.get(0),
-                new APIResponseImpl());
+
+        // Make sure the @Produces wasn't empty, and check that no @APIResponses have been added
+        if (producesTypes.isEmpty() && context.getCurrentOperation().getResponses().size() == 1) {
+            for (String producesType : producesTypes) {
+                context.getCurrentOperation().getResponses().addApiResponse(producesType, new APIResponseImpl());
+            }
+        }
         super.visitEnd();
     }
 
