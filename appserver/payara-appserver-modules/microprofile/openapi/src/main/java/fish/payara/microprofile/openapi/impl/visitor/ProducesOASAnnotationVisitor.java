@@ -9,7 +9,7 @@ import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
 
 public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
 
-    private List<String> producesTypes = new ArrayList<>();
+    private List<String> producesTypes = new ArrayList<>(3);
 
     public ProducesOASAnnotationVisitor(OASContext context) {
         super(context);

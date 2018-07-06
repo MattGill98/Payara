@@ -2,6 +2,9 @@ package fish.payara.microprofile.openapi.impl.visitor;
 
 import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
@@ -10,6 +13,8 @@ import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
 
 public final class OASMethodVisitor extends MethodVisitor {
+
+    private static final Logger LOGGER = Logger.getLogger(OASMethodVisitor.class.getName());
 
     private final OASContext context;
 
@@ -46,6 +51,7 @@ public final class OASMethodVisitor extends MethodVisitor {
     @Override
     public void visitEnd() {
         if (context.isOperationValid()) {
+            LOGGER.log(Level.INFO, "Operation found at path: " + context.getPath());
             PathItem pathItem = context.getApi().getPaths().get(context.getPath());
             if (pathItem == null) {
                 pathItem = new PathItemImpl();
