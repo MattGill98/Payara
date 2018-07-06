@@ -44,6 +44,7 @@ import java.util.LinkedList;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
+import org.glassfish.hk2.external.org.objectweb.asm.Type;
 
 public class OASContext {
 
@@ -138,15 +139,11 @@ public class OASContext {
     }
 
     public static String getClassName(String name) {
-        if (name == null) {
-            return "";
+        try {
+            return Type.getReturnType(name).getClassName();
+        } catch (Throwable t) {
+            return Type.getType(name).getClassName();
         }
-        name = name.replace("/", ".");
-        if (name.startsWith("L"))
-            name = name.substring(1);
-        if (name.endsWith(";"))
-            name = name.substring(0, name.length() - 1);
-        return name;
     }
 
     public static String normaliseUrl(String... urlComponents) {
