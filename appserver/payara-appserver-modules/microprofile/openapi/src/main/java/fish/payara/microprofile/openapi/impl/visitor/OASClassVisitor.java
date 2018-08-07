@@ -47,8 +47,6 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        context.setAnnotationName(getClassName(desc));
-
         if (ApplicationPath.class.getName().equals(getClassName(desc))) {
             return new ApplicationPathOASAnnotationVisitor(context);
         } else if (Path.class.getName().equals(getClassName(desc))) {

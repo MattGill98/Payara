@@ -14,7 +14,6 @@ public abstract class OASAnnotationVisitor extends AnnotationVisitor {
 
     @Override
     public void visitEnd() {
-        context.clearAnnotationName();
         super.visitEnd();
     }
 }

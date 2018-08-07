@@ -18,6 +18,8 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     private final OASContext context;
 
+    private String httpMethodName;
+
     public OASMethodVisitor(OASContext context) {
         super(Opcodes.ASM5);
         this.context = context;
@@ -25,10 +27,9 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        context.setAnnotationName(getClassName(desc));
-
         if (desc != null) {
-            switch (getClassName(desc)) {
+            String className = getClassName(desc);
+            switch (className) {
                 case "javax.ws.rs.Path":
                     return new PathOASAnnotationVisitor(context, true);
                 case "javax.ws.rs.GET":
@@ -39,7 +40,8 @@ public final class OASMethodVisitor extends MethodVisitor {
                 case "javax.ws.rs.OPTIONS":
                 case "javax.ws.rs.HEAD":
                 case "javax.ws.rs.TRACE":
-                    return new HttpMethodOASAnnotationVisitor(context);
+                    httpMethodName = className;
+                    return new HttpMethodOASAnnotationVisitor(context, className);
                 case "javax.ws.rs.Produces":
                     return new ProducesOASAnnotationVisitor(context);
             }
@@ -50,14 +52,14 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitEnd() {
-        if (context.isOperationValid()) {
+        if (context.isOperationValid(httpMethodName != null)) {
             LOGGER.log(Level.INFO, "Operation found at path: " + context.getPath());
             PathItem pathItem = context.getApi().getPaths().get(context.getPath());
             if (pathItem == null) {
                 pathItem = new PathItemImpl();
                 context.getApi().getPaths().addPathItem(context.getPath(), pathItem);
             }
-            switch (context.getOperationMethod()) {
+            switch (httpMethodName) {
                 case "javax.ws.rs.GET":
                     pathItem.GET(context.getCurrentOperation()); break;
                 case "javax.ws.rs.POST":
@@ -77,7 +79,7 @@ public final class OASMethodVisitor extends MethodVisitor {
             }
         }
 
-        context.clearWorkingOperation();
+        context.clearCurrentOperation();
         super.visitEnd();
     }
 }
