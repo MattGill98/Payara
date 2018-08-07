@@ -6,15 +6,19 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.openapi.models.responses.APIResponse;
+import org.eclipse.microprofile.openapi.models.responses.APIResponses;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 
 public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
 
+    private APIResponses currentResponses;
+
     private List<String> producesTypes;
 
-    public ProducesOASAnnotationVisitor(OASContext context) {
+    public ProducesOASAnnotationVisitor(OASContext context, APIResponses currentResponses) {
         super(context);
-        producesTypes = new ArrayList<>(3);
+        this.producesTypes = new ArrayList<>(3);
+        this.currentResponses = currentResponses;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
         // If @Produce types have been added
         if (!producesTypes.isEmpty()) {
             // Find the default response
-            APIResponse defaultResponse = context.getCurrentOperation().getResponses().getDefault();
+            APIResponse defaultResponse = currentResponses.getDefault();
             // If it exists, and there is a wildcard content
             if (defaultResponse != null && defaultResponse.getContent().get(MediaType.WILDCARD) != null) {
                 // Copy the wildcard content to all the produce types, and remove the wildcard
