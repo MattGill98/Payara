@@ -44,6 +44,9 @@ public final class OASMethodVisitor extends MethodVisitor {
                     return new HttpMethodOASAnnotationVisitor(context, className);
                 case "javax.ws.rs.Produces":
                     return new ProducesOASAnnotationVisitor(context);
+                case "org.eclipse.microprofile.openapi.annotations.responses.APIResponse":
+                case "org.eclipse.microprofile.openapi.annotations.responses.APIResponses":
+                    return new APIResponseOASAnnotationVisitor(context);
             }
         }
 
