@@ -3,22 +3,23 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
 import org.eclipse.microprofile.openapi.models.responses.APIResponse;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 
-import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
-
 public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
 
-    private List<String> producesTypes = new ArrayList<>(3);
+    private List<String> producesTypes;
 
     public ProducesOASAnnotationVisitor(OASContext context) {
         super(context);
+        producesTypes = new ArrayList<>(3);
     }
 
     @Override
     public void visit(String name, Object value) {
-        if (name == null && value != null && value.toString().isEmpty()) {
+        if (name == null && value != null && !value.toString().isEmpty()) {
             producesTypes.add((String) value);
         }
         super.visit(name, value);
@@ -32,10 +33,18 @@ public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
     @Override
     public void visitEnd() {
 
-        // Make sure the @Produces wasn't empty, and check that no @APIResponses have been added
-        if (producesTypes.isEmpty() && context.getCurrentOperation().getResponses().size() == 1) {
-            for (String producesType : producesTypes) {
-                context.getCurrentOperation().getResponses().addApiResponse(producesType, new APIResponseImpl());
+        // If @Produce types have been added
+        if (!producesTypes.isEmpty()) {
+            // Find the default response
+            APIResponse defaultResponse = context.getCurrentOperation().getResponses().getDefault();
+            // If it exists, and there is a wildcard content
+            if (defaultResponse != null && defaultResponse.getContent().get(MediaType.WILDCARD) != null) {
+                // Copy the wildcard content to all the produce types, and remove the wildcard
+                for (String producesType : producesTypes) {
+                    defaultResponse.getContent().addMediaType(producesType,
+                            defaultResponse.getContent().get(MediaType.WILDCARD));
+                }
+                defaultResponse.getContent().remove(MediaType.WILDCARD);
             }
         }
         super.visitEnd();
