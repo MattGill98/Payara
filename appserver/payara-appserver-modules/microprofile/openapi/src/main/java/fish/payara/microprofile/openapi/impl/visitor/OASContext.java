@@ -55,8 +55,6 @@ public class OASContext {
     private String classPath;
     private String resourcePath;
 
-    private Operation currentOperation;
-
     public OASContext(OpenAPI openapi) {
         this(openapi, null);
     }
@@ -100,18 +98,6 @@ public class OASContext {
 
     public boolean isOperationValid(boolean validMethod) {
         return validMethod && classPath != null;
-    }
-
-    public Operation getCurrentOperation() {
-        return currentOperation;
-    }
-
-    public void setCurrentOperation(Operation currentOperation) {
-        this.currentOperation = currentOperation;
-    }
-
-    public void clearCurrentOperation() {
-        setCurrentOperation(null);
     }
 
     public static String getClassName(String name) {

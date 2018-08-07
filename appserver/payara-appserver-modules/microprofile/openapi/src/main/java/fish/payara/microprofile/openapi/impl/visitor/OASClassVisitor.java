@@ -63,8 +63,7 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        context.setCurrentOperation(getDefaultOperation(name, getClassName(desc)));
-        return new OASMethodVisitor(context);
+        return new OASMethodVisitor(context, getDefaultOperation(name, getClassName(desc)));
     }
 
     @Override

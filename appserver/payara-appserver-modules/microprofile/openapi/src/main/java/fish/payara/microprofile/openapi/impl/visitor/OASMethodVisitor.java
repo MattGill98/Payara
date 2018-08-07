@@ -5,6 +5,7 @@ import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassN
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
@@ -19,10 +20,12 @@ public final class OASMethodVisitor extends MethodVisitor {
     private final OASContext context;
 
     private String httpMethodName;
+    private Operation currentOperation;
 
-    public OASMethodVisitor(OASContext context) {
+    public OASMethodVisitor(OASContext context, Operation currentOperation) {
         super(Opcodes.ASM5);
         this.context = context;
+        this.currentOperation = currentOperation;
     }
 
     @Override
@@ -43,10 +46,10 @@ public final class OASMethodVisitor extends MethodVisitor {
                     httpMethodName = className;
                     return new HttpMethodOASAnnotationVisitor(context, className);
                 case "javax.ws.rs.Produces":
-                    return new ProducesOASAnnotationVisitor(context);
+                    return new ProducesOASAnnotationVisitor(context, currentOperation.getResponses());
                 case "org.eclipse.microprofile.openapi.annotations.responses.APIResponse":
                 case "org.eclipse.microprofile.openapi.annotations.responses.APIResponses":
-                    return new APIResponseOASAnnotationVisitor(context);
+                    return new APIResponseOASAnnotationVisitor(context, currentOperation.getResponses());
             }
         }
 
@@ -64,25 +67,23 @@ public final class OASMethodVisitor extends MethodVisitor {
             }
             switch (httpMethodName) {
                 case "javax.ws.rs.GET":
-                    pathItem.GET(context.getCurrentOperation()); break;
+                    pathItem.GET(currentOperation); break;
                 case "javax.ws.rs.POST":
-                    pathItem.POST(context.getCurrentOperation()); break;
+                    pathItem.POST(currentOperation); break;
                 case "javax.ws.rs.PUT":
-                    pathItem.PUT(context.getCurrentOperation()); break;
+                    pathItem.PUT(currentOperation); break;
                 case "javax.ws.rs.DELETE":
-                    pathItem.DELETE(context.getCurrentOperation()); break;
+                    pathItem.DELETE(currentOperation); break;
                 case "javax.ws.rs.PATCH":
-                    pathItem.PATCH(context.getCurrentOperation()); break;
+                    pathItem.PATCH(currentOperation); break;
                 case "javax.ws.rs.OPTIONS":
-                    pathItem.OPTIONS(context.getCurrentOperation()); break;
+                    pathItem.OPTIONS(currentOperation); break;
                 case "javax.ws.rs.HEAD":
-                    pathItem.HEAD(context.getCurrentOperation()); break;
+                    pathItem.HEAD(currentOperation); break;
                 case "javax.ws.rs.TRACE":
-                    pathItem.TRACE(context.getCurrentOperation()); break;
+                    pathItem.TRACE(currentOperation); break;
             }
         }
-
-        context.clearCurrentOperation();
         super.visitEnd();
     }
 }
