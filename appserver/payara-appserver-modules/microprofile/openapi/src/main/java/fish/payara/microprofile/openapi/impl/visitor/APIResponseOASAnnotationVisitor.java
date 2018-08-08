@@ -2,6 +2,8 @@ package fish.payara.microprofile.openapi.impl.visitor;
 
 import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 
+import java.util.logging.Logger;
+
 import org.eclipse.microprofile.openapi.models.responses.APIResponse;
 import org.eclipse.microprofile.openapi.models.responses.APIResponses;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
@@ -11,6 +13,8 @@ import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
 import fish.payara.microprofile.openapi.impl.model.responses.APIResponsesImpl;
 
 public class APIResponseOASAnnotationVisitor extends OASAnnotationVisitor {
+
+    private static final Logger LOGGER = Logger.getLogger(APIResponseOASAnnotationVisitor.class.getName());
 
     private APIResponses currentResponses;
     private APIResponse currentResponse;
@@ -25,11 +29,17 @@ public class APIResponseOASAnnotationVisitor extends OASAnnotationVisitor {
 
     @Override
     public void visit(String name, Object value) {
-        if ("responseCode".equals(name)) {
-            responseCode = value.toString();
-        }
-        if ("description".equals(name)) {
-            currentResponse.setDescription(value.toString());
+        if (name != null) {
+            switch (name) {
+                case "responseCode":
+                    responseCode = value.toString();
+                    break;
+                case "description":
+                    currentResponse.setDescription(value.toString());
+                    break;
+                default:
+                    LOGGER.info(String.format("Unrecognised property: '%s'.", name));
+            }
         }
         super.visit(name, value);
     }
@@ -49,6 +59,8 @@ public class APIResponseOASAnnotationVisitor extends OASAnnotationVisitor {
                 case "org.eclipse.microprofile.openapi.annotations.media.Content":
                     currentResponse.setContent(new ContentImpl());
                     return new ContentOASAnnotationVisitor(context, currentResponse.getContent());
+                default:
+                    LOGGER.info(String.format("Unrecognised annotation: '%s'.", className));
             }
         }
         return super.visitAnnotation(name, desc);
