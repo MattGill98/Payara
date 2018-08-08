@@ -17,13 +17,13 @@ import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.ClassVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.FieldVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
 import fish.payara.microprofile.openapi.impl.model.OperationImpl;
 import fish.payara.microprofile.openapi.impl.model.media.ContentImpl;
 import fish.payara.microprofile.openapi.impl.model.media.MediaTypeImpl;
 import fish.payara.microprofile.openapi.impl.model.media.SchemaImpl;
 import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 
 public final class OASClassVisitor extends ClassVisitor {
 
@@ -34,7 +34,7 @@ public final class OASClassVisitor extends ClassVisitor {
     private String className;
 
     public OASClassVisitor(OASContext context) {
-        super(Opcodes.ASM5);
+        super(ASMProcessor.ASM_VERSION);
         this.context = context;
     }
 

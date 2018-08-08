@@ -8,10 +8,11 @@ import java.util.logging.Logger;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
+import org.glassfish.hk2.external.org.objectweb.asm.Label;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
 
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 
 public final class OASMethodVisitor extends MethodVisitor {
 
@@ -23,9 +24,14 @@ public final class OASMethodVisitor extends MethodVisitor {
     private Operation currentOperation;
 
     public OASMethodVisitor(OASContext context, Operation currentOperation) {
-        super(Opcodes.ASM5);
+        super(ASMProcessor.ASM_VERSION);
         this.context = context;
         this.currentOperation = currentOperation;
+    }
+
+    @Override
+    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+        super.visitLocalVariable(name, desc, signature, start, end, index);
     }
 
     @Override
