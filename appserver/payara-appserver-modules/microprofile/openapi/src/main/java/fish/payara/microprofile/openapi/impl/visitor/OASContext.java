@@ -42,7 +42,6 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import java.util.LinkedList;
 
 import org.eclipse.microprofile.openapi.models.OpenAPI;
-import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.glassfish.hk2.external.org.objectweb.asm.Type;
 
