@@ -1,11 +1,15 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
 import java.math.BigDecimal;
+import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 import java.util.logging.Logger;
 
+import org.eclipse.microprofile.openapi.models.ExternalDocumentation;
 import org.eclipse.microprofile.openapi.models.media.Schema;
 import org.eclipse.microprofile.openapi.models.media.Schema.SchemaType;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
+
+import fish.payara.microprofile.openapi.impl.model.ExternalDocumentationImpl;
 
 public class SchemaOASAnnotationVisitor extends OASAnnotationVisitor {
 
@@ -14,6 +18,8 @@ public class SchemaOASAnnotationVisitor extends OASAnnotationVisitor {
     private final Schema currentSchema;
 
     private String arrayName;
+
+    private ExternalDocumentation externalDocs;
 
     public SchemaOASAnnotationVisitor(OASContext context, Schema currentSchema) {
         super(context);
@@ -114,6 +120,14 @@ public class SchemaOASAnnotationVisitor extends OASAnnotationVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String name, String desc) {
+        if (desc != null) {
+            String className = getClassName(desc);
+            switch (className) {
+                case "org.eclipse.microprofile.openapi.annotations.ExternalDocumentation":
+                    externalDocs = new ExternalDocumentationImpl();
+                    return new ExternalDocumentationOASAnnotationVisitor(context, externalDocs);
+            }
+        }
         return super.visitAnnotation(name, desc);
     }
 
@@ -127,6 +141,9 @@ public class SchemaOASAnnotationVisitor extends OASAnnotationVisitor {
 
     @Override
     public void visitEnd() {
+        if (externalDocs != null) {
+            currentSchema.setExternalDocs(externalDocs);
+        }
         super.visitEnd();
     }
 
