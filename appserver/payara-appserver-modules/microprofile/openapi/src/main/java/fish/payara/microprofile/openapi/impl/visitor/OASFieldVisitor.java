@@ -2,12 +2,13 @@ package fish.payara.microprofile.openapi.impl.visitor;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
+
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 
 public final class OASFieldVisitor extends FieldVisitor {
 
     public OASFieldVisitor() {
-        super(Opcodes.ASM5);
+        super(ASMProcessor.ASM_VERSION);
     }
 
     @Override
