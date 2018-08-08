@@ -39,7 +39,9 @@
  */
 package fish.payara.microprofile.openapi.impl.visitor;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.PathItem;
@@ -54,6 +56,8 @@ public class OASContext {
     private String classPath;
     private String resourcePath;
 
+    private Map<String, String> schemaNameMap;
+
     public OASContext(OpenAPI openapi) {
         this(openapi, null);
     }
@@ -63,6 +67,7 @@ public class OASContext {
         this.classPath = null;
         this.resourcePath = null;
         this.applicationPath = applicationPath;
+        this.schemaNameMap = new HashMap<>();
     }
 
     public OpenAPI getApi() {
@@ -98,6 +103,21 @@ public class OASContext {
     public boolean isOperationValid(boolean validMethod) {
         return validMethod && classPath != null;
     }
+
+    public void setSchemaName(String className, String schemaName) {
+        if (schemaNameMap.containsKey(className)) {
+            String oldSchemaName = new String(schemaNameMap.get(className));
+            openapi.getComponents().getSchemas().put(schemaName, openapi.getComponents().getSchemas().remove(oldSchemaName));
+        }
+        schemaNameMap.put(className, schemaName);
+    }
+
+    public String getSchemaName(String className) {
+        return schemaNameMap.get(className);
+    }
+
+
+    // STATIC METHODS
 
     public static String getClassName(String name) {
         try {
