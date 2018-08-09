@@ -1,7 +1,8 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +11,7 @@ import org.eclipse.microprofile.openapi.models.PathItem;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
 import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
@@ -23,21 +25,35 @@ public final class OASMethodVisitor extends MethodVisitor {
     private String httpMethodName;
     private Operation currentOperation;
 
+    private List<Type> parameterTypes;
+
     public OASMethodVisitor(OASContext context, Operation currentOperation) {
+        this(context, currentOperation, new Type[0]);
+    }
+
+    public OASMethodVisitor(OASContext context, Operation currentOperation, Type[] parameterTypes) {
         super(ASMProcessor.ASM_VERSION);
         this.context = context;
         this.currentOperation = currentOperation;
+        this.parameterTypes = new ArrayList<>(Arrays.asList(parameterTypes));
     }
 
-    @Override
+	@Override
     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+        if (!"this".equals(name) && parameterTypes.size() > 0 && Type.getType(desc).equals(parameterTypes.get(0))) {
+            visitParameter(name, parameterTypes.remove(0).getClassName());
+        }
         super.visitLocalVariable(name, desc, signature, start, end, index);
+    }
+
+    public void visitParameter(String name, String type) {
+        System.out.println("Visited endpoint parameter " + name + " of type: " + type);
     }
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
         if (desc != null) {
-            String className = getClassName(desc);
+            String className = Type.getType(desc).getClassName();
             switch (className) {
                 case "javax.ws.rs.Path":
                     return new PathOASAnnotationVisitor(context, true);
@@ -66,7 +82,7 @@ public final class OASMethodVisitor extends MethodVisitor {
     public void visitEnd() {
         if (context.isOperationValid(httpMethodName != null)) {
             LOGGER.log(Level.INFO, "Operation found at path: " + context.getPath());
-            PathItem pathItem = context.getApi().getPaths().get(context.getPath());
+            PathItem pathItem = context.getApi().getPaths().getPathItem(context.getPath());
             if (pathItem == null) {
                 pathItem = new PathItemImpl();
                 context.getApi().getPaths().addPathItem(context.getPath(), pathItem);
