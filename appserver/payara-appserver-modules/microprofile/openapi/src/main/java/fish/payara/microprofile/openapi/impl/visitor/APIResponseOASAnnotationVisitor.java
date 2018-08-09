@@ -1,12 +1,12 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 
 import java.util.logging.Logger;
 
 import org.eclipse.microprofile.openapi.models.responses.APIResponse;
 import org.eclipse.microprofile.openapi.models.responses.APIResponses;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
+import org.glassfish.pfl.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.media.ContentImpl;
 import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
@@ -52,7 +52,7 @@ public class APIResponseOASAnnotationVisitor extends OASAnnotationVisitor {
     @Override
     public AnnotationVisitor visitAnnotation(String name, String desc) {
         if (desc != null) {
-            String className = getClassName(desc);
+            String className = Type.getType(desc).getClassName();
             switch (className) {
                 case "org.eclipse.microprofile.openapi.annotations.responses.APIResponse":
                     return new APIResponseOASAnnotationVisitor(context, currentResponses);

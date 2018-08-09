@@ -1,12 +1,10 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getClassName;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.openapi.models.Operation;
@@ -17,6 +15,7 @@ import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.ClassVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.FieldVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
+import org.glassfish.hk2.external.org.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.OperationImpl;
 import fish.payara.microprofile.openapi.impl.model.media.ContentImpl;
@@ -47,12 +46,15 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (ApplicationPath.class.getName().equals(getClassName(desc))) {
-            return new ApplicationPathOASAnnotationVisitor(context);
-        } else if (Path.class.getName().equals(getClassName(desc))) {
-            return new PathOASAnnotationVisitor(context, false);
+        if (desc != null) {
+            String className = Type.getType(desc).getClassName();
+            switch (className) {
+                case "javax.ws.rs.ApplicationPath":
+                    return new ApplicationPathOASAnnotationVisitor(context);
+                case "javax.ws.rs.Path":
+                    return new PathOASAnnotationVisitor(context, false);
+            }
         }
-
         return super.visitAnnotation(desc, visible);
     }
 
@@ -63,7 +65,7 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        return new OASMethodVisitor(context, getDefaultOperation(name, getClassName(desc)));
+        return new OASMethodVisitor(context, getDefaultOperation(name, Type.getReturnType(desc).getClassName()), "<init>".equals(name)? new Type[0]: Type.getArgumentTypes(desc));
     }
 
     @Override

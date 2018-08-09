@@ -113,19 +113,11 @@ public class OASContext {
     }
 
     public String getSchemaName(String className) {
-        return schemaNameMap.get(className);
+        return schemaNameMap.getOrDefault(className, className);
     }
 
 
     // STATIC METHODS
-
-    public static String getClassName(String name) {
-        try {
-            return Type.getReturnType(name).getClassName();
-        } catch (Throwable t) {
-            return Type.getType(name).getClassName();
-        }
-    }
 
     public static String normaliseUrl(String... urlComponents) {
         if (urlComponents == null || urlComponents.length == 0) {
