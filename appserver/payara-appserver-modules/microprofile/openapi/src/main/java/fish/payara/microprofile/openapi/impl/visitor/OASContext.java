@@ -42,10 +42,13 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.PathItem;
-import org.glassfish.hk2.external.org.objectweb.asm.Type;
+
+import fish.payara.microprofile.openapi.impl.model.media.SchemaImpl;
 
 public class OASContext {
 
@@ -56,7 +59,7 @@ public class OASContext {
     private String classPath;
     private String resourcePath;
 
-    private Map<String, String> schemaNameMap;
+    private Map<String, SchemaImpl> schemaMap;
 
     public OASContext(OpenAPI openapi) {
         this(openapi, null);
@@ -67,7 +70,7 @@ public class OASContext {
         this.classPath = null;
         this.resourcePath = null;
         this.applicationPath = applicationPath;
-        this.schemaNameMap = new HashMap<>();
+        this.schemaMap = new HashMap<>();
     }
 
     public OpenAPI getApi() {
@@ -104,18 +107,12 @@ public class OASContext {
         return validMethod && classPath != null;
     }
 
-    public void setSchemaName(String className, String schemaName) {
-        if (schemaNameMap.containsKey(className)) {
-            String oldSchemaName = new String(schemaNameMap.get(className));
-            openapi.getComponents().getSchemas().put(schemaName, openapi.getComponents().getSchemas().remove(oldSchemaName));
+    public SchemaImpl getSchema(String className) {
+        if (!schemaMap.containsKey(className)) {
+            schemaMap.put(className, new SchemaImpl().schemaName(className));
         }
-        schemaNameMap.put(className, schemaName);
+        return schemaMap.get(className);
     }
-
-    public String getSchemaName(String className) {
-        return schemaNameMap.getOrDefault(className, className);
-    }
-
 
     // STATIC METHODS
 
@@ -139,6 +136,17 @@ public class OASContext {
         urlBuilder.deleteCharAt(urlBuilder.length() - 1);
 
         return urlBuilder.toString().replaceAll("/+", "/");
+    }
+
+    public static String getSimpleName(String className) {
+        if (className == null) {
+            return null;
+        }
+        Matcher simpleNameMatcher = Pattern.compile(".+[$\\.](.+)").matcher(className);
+        if (simpleNameMatcher.matches()) {
+            return simpleNameMatcher.group(1);
+        }
+        return className;
     }
 
 }

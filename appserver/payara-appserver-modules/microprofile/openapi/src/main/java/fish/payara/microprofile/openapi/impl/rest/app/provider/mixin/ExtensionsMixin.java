@@ -73,4 +73,7 @@ public interface ExtensionsMixin {
     @JsonInclude(value = Include.CUSTOM, valueFilter = ComponentsFilter.class)
     public abstract Components getComponents();
 
+    @JsonIgnore
+    public abstract String getSchemaName();
+
 }

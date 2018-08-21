@@ -106,6 +106,8 @@ public class SchemaImpl extends ExtensibleImpl implements Schema {
     protected Object additionalProperties;
     protected Schema items;
 
+    protected String schemaName;
+
     @Override
     public Discriminator getDiscriminator() {
         return discriminator;
@@ -731,6 +733,19 @@ public class SchemaImpl extends ExtensibleImpl implements Schema {
     public Schema additionalProperties(Boolean additionalProperties) {
         setAdditionalProperties(additionalProperties);
         return this;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public SchemaImpl schemaName(String schemaName) {
+        setSchemaName(schemaName);
+        return this;
+    }
+
+    public void setSchemaName(String schemaName) {
+       this.schemaName = schemaName;
     }
 
     public static void merge(org.eclipse.microprofile.openapi.annotations.media.Schema from, Schema to,
