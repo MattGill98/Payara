@@ -2,21 +2,24 @@ package fish.payara.microprofile.openapi.impl.visitor;
 
 import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getSimpleName;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.MediaType;
+
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
+import org.eclipse.microprofile.openapi.models.parameters.RequestBody;
 import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.Label;
 import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
 import org.glassfish.hk2.external.org.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
+import fish.payara.microprofile.openapi.impl.model.media.ContentImpl;
+import fish.payara.microprofile.openapi.impl.model.media.MediaTypeImpl;
 import fish.payara.microprofile.openapi.impl.model.media.SchemaImpl;
+import fish.payara.microprofile.openapi.impl.model.parameters.RequestBodyImpl;
 import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 
 public final class OASMethodVisitor extends MethodVisitor {
@@ -28,31 +31,41 @@ public final class OASMethodVisitor extends MethodVisitor {
     private String httpMethodName;
     private Operation currentOperation;
 
-    private List<Type> parameterTypes;
+    private int parameterCount;
+
+    private String parameterAnnotation;
 
     public OASMethodVisitor(OASContext context, Operation currentOperation) {
-        this(context, currentOperation, new Type[0]);
+        this(context, currentOperation, 0);
     }
 
-    public OASMethodVisitor(OASContext context, Operation currentOperation, Type[] parameterTypes) {
+    public OASMethodVisitor(OASContext context, Operation currentOperation, int parameterCount) {
         super(ASMProcessor.ASM_VERSION);
         this.context = context;
         this.currentOperation = currentOperation;
-        this.parameterTypes = new ArrayList<>(Arrays.asList(parameterTypes));
+        this.parameterCount = parameterCount;
     }
 
 	@Override
     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-        if (!"this".equals(name) && parameterTypes.size() > 0 && Type.getType(desc).equals(parameterTypes.get(0))) {
-            visitParameter(name, parameterTypes.remove(0).getClassName());
+        if (!"this".equals(name) && parameterCount > 0) {
+            parameterCount --;
+            visitParameter(name, Type.getType(desc).getClassName());
+            parameterAnnotation = null;
         }
         super.visitLocalVariable(name, desc, signature, start, end, index);
     }
 
-    public void visitParameter(String name, String type) {
-        System.out.println("Visited endpoint parameter " + name + " of type: " + type);
+    @Override
+    public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
+        parameterAnnotation = Type.getType(desc).getClassName();
+        return super.visitParameterAnnotation(parameter, desc, visible);
+    }
 
-        // If the schema has been found already, add it
+    public void visitParameter(String name, String type) {
+        System.out.println("Visited endpoint parameter " + name + " of type: " + type + " with annotation: " + parameterAnnotation);
+
+        // If the variable type is a schema, add it to the document
         if (context.containsSchema(type)) {
             SchemaImpl classSchema = context.getSchema(type);
             classSchema.setSchemaEnabled(true);
@@ -60,9 +73,17 @@ public final class OASMethodVisitor extends MethodVisitor {
         } else {
             context.addSchema(type, new SchemaImpl().schemaName(getSimpleName(type)));
         }
+
+        if (parameterAnnotation == null || "org.eclipse.microprofile.openapi.annotations.media.Schema".equals(parameterAnnotation)) {
+            currentOperation.setRequestBody(createRequestBody(type));
+        }
     }
 
-    @Override
+    private RequestBody createRequestBody(String type) {
+		return new RequestBodyImpl().content(new ContentImpl().addMediaType(MediaType.WILDCARD, new MediaTypeImpl().schema(new SchemaImpl().ref(getSimpleName(type)))));
+	}
+
+	@Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
         if (desc != null) {
             String className = Type.getType(desc).getClassName();

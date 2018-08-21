@@ -86,7 +86,7 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        return new OASMethodVisitor(context, getDefaultOperation(name, Type.getReturnType(desc).getClassName()), "<init>".equals(name)? new Type[0]: Type.getArgumentTypes(desc));
+        return new OASMethodVisitor(context, getDefaultOperation(name, Type.getReturnType(desc).getClassName()), "<init>".equals(name)? 0: Type.getArgumentTypes(desc).length);
     }
 
     @Override
