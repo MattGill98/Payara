@@ -52,9 +52,10 @@ public final class OASMethodVisitor extends MethodVisitor {
     public void visitParameter(String name, String type) {
         System.out.println("Visited endpoint parameter " + name + " of type: " + type);
 
-        // If the schema has been found
+        // If the schema has been found already, add it
         if (context.containsSchema(type)) {
             SchemaImpl classSchema = context.getSchema(type);
+            classSchema.setSchemaEnabled(true);
             context.getApi().getComponents().addSchema(classSchema.getSchemaName(), classSchema);
         } else {
             context.addSchema(type, new SchemaImpl().schemaName(getSimpleName(type)));

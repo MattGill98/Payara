@@ -32,7 +32,6 @@ public final class OASClassVisitor extends ClassVisitor {
 
     private String className;
 
-    private boolean writeSchema;
     private SchemaImpl classSchema;
 
     public OASClassVisitor(OASContext context) {
@@ -49,12 +48,13 @@ public final class OASClassVisitor extends ClassVisitor {
         // If the schema should exist, find it
         if (context.containsSchema(className)) {
             classSchema = context.getSchema(className);
-            writeSchema = true;
+            classSchema.setSchemaEnabled(true);
         } else {
             // Set the schema name
             String simpleClassname = getSimpleName(className);
             classSchema.setSchemaName(simpleClassname);
         }
+        context.addSchema(className, classSchema);
 
         super.visit(version, access, name, signature, superName, interfaces);
     }
@@ -69,7 +69,7 @@ public final class OASClassVisitor extends ClassVisitor {
                 case "javax.ws.rs.Path":
                     return new PathOASAnnotationVisitor(context, false);
                 case "org.eclipse.microprofile.openapi.annotations.media.Schema":
-                    writeSchema = true;
+                    classSchema.setSchemaEnabled(true);
                     return new SchemaOASAnnotationVisitor(context, classSchema);
             }
         }
@@ -78,6 +78,9 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+        if (!"this$0".equals(name)) {
+            classSchema.addProperty(name, new SchemaImpl().type(getSchemaType(Type.getType(desc).getClassName())));
+        }
         return new OASFieldVisitor();
     }
 
@@ -88,7 +91,7 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        if (writeSchema) {
+        if (classSchema.isSchemaEnabled()) {
             context.getApi().getComponents().addSchema(classSchema.getSchemaName(), classSchema);
         }
         LOGGER.log(Level.INFO, "Leaving class: " + className);

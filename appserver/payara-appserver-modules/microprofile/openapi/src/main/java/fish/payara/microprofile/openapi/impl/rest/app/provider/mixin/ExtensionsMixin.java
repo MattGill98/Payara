@@ -76,4 +76,7 @@ public interface ExtensionsMixin {
     @JsonIgnore
     public abstract String getSchemaName();
 
+    @JsonIgnore
+    public abstract boolean isSchemaEnabled();
+
 }
