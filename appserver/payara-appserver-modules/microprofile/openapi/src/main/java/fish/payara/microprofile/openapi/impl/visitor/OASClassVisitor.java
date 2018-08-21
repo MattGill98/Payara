@@ -1,7 +1,7 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
+import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getSimpleName;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,15 +32,30 @@ public final class OASClassVisitor extends ClassVisitor {
 
     private String className;
 
+    private boolean writeSchema;
+    private SchemaImpl classSchema;
+
     public OASClassVisitor(OASContext context) {
         super(ASMProcessor.ASM_VERSION);
         this.context = context;
+        this.classSchema = new SchemaImpl();
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        this.className = name;
-        LOGGER.log(Level.INFO, "Entering class: " + name);
+        this.className = Type.getObjectType(name).getClassName();
+        LOGGER.log(Level.INFO, "Entering class: " + className);
+
+        // If the schema should exist, find it
+        if (context.containsSchema(className)) {
+            classSchema = context.getSchema(className);
+            writeSchema = true;
+        } else {
+            // Set the schema name
+            String simpleClassname = getSimpleName(className);
+            classSchema.setSchemaName(simpleClassname);
+        }
+
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
@@ -53,6 +68,9 @@ public final class OASClassVisitor extends ClassVisitor {
                     return new ApplicationPathOASAnnotationVisitor(context);
                 case "javax.ws.rs.Path":
                     return new PathOASAnnotationVisitor(context, false);
+                case "org.eclipse.microprofile.openapi.annotations.media.Schema":
+                    writeSchema = true;
+                    return new SchemaOASAnnotationVisitor(context, classSchema);
             }
         }
         return super.visitAnnotation(desc, visible);
@@ -70,6 +88,9 @@ public final class OASClassVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
+        if (writeSchema) {
+            context.getApi().getComponents().addSchema(classSchema.getSchemaName(), classSchema);
+        }
         LOGGER.log(Level.INFO, "Leaving class: " + className);
         super.visitEnd();
     }

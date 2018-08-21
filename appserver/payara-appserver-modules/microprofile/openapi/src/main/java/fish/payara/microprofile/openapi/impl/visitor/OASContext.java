@@ -107,11 +107,20 @@ public class OASContext {
         return validMethod && classPath != null;
     }
 
+    public boolean containsSchema(String className) {
+        return schemaMap.containsKey(className);
+    }
+
     public SchemaImpl getSchema(String className) {
-        if (!schemaMap.containsKey(className)) {
-            schemaMap.put(className, new SchemaImpl().schemaName(className));
-        }
         return schemaMap.get(className);
+    }
+
+    public boolean addSchema(String className, SchemaImpl schema) {
+        if (schemaMap.containsKey(className)) {
+            return false;
+        }
+        schemaMap.put(className, schema);
+        return true;
     }
 
     // STATIC METHODS

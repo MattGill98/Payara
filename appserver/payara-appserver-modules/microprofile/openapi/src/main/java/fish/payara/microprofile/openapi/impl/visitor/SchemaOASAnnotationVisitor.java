@@ -10,6 +10,7 @@ import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.pfl.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.ExternalDocumentationImpl;
+import fish.payara.microprofile.openapi.impl.model.media.SchemaImpl;
 
 public class SchemaOASAnnotationVisitor extends OASAnnotationVisitor {
 
@@ -105,6 +106,11 @@ public class SchemaOASAnnotationVisitor extends OASAnnotationVisitor {
                     break;
                 case "enumeration":
                     currentSchema.addEnumeration(value);
+                    break;
+                case "name":
+                    if (currentSchema instanceof SchemaImpl) {
+                        SchemaImpl.class.cast(currentSchema).setSchemaName(value.toString());
+                    }
                     break;
                 default:
                     LOGGER.info(String.format("Unrecognised property: '%s'.", name));
