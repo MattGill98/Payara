@@ -110,6 +110,7 @@ public class SchemaImpl extends ExtensibleImpl<Schema> implements Schema {
     private Schema items;
 
     protected String schemaName;
+    protected boolean schemaEnabled;
 
     @Override
     public Discriminator getDiscriminator() {
@@ -590,6 +591,14 @@ public class SchemaImpl extends ExtensibleImpl<Schema> implements Schema {
 
     public void setSchemaName(String schemaName) {
        this.schemaName = schemaName;
+    }
+
+    public boolean isSchemaEnabled() {
+        return schemaEnabled;
+    }
+
+    public void setSchemaEnabled(boolean schemaEnabled) {
+        this.schemaEnabled = schemaEnabled;
     }
 
     public static void merge(org.eclipse.microprofile.openapi.annotations.media.Schema from, Schema to,

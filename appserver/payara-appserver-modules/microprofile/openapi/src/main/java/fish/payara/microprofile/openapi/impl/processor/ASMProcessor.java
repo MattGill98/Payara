@@ -27,6 +27,7 @@ public class ASMProcessor implements OASProcessor {
     public OpenAPI process(OpenAPI api, OpenApiConfiguration config) {
 
         String applicationPath = null;
+        OASContext context = new OASContext(api, applicationPath);
 
         for (String entry : Collections.list(archive.entries())) {
             if (entry.endsWith(".class")) {
@@ -37,7 +38,6 @@ public class ASMProcessor implements OASProcessor {
                     e.printStackTrace();
                 }
                 if (reader != null) {
-                    OASContext context = new OASContext(api, applicationPath);
                     reader.accept(new OASClassVisitor(context),
                             ClassReader.SKIP_FRAMES);
                     applicationPath = context.getApplicationPath();
