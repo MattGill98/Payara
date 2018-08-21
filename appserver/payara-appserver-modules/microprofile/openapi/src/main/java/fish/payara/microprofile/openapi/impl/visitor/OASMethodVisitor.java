@@ -1,8 +1,12 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
+import static fish.payara.microprofile.openapi.impl.visitor.OASContext.getSimpleName;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +18,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
+import fish.payara.microprofile.openapi.impl.model.media.SchemaImpl;
 import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 
 public final class OASMethodVisitor extends MethodVisitor {
@@ -27,6 +32,8 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     private List<Type> parameterTypes;
 
+    private Map<String, SchemaImpl> schemaMap;
+
     public OASMethodVisitor(OASContext context, Operation currentOperation) {
         this(context, currentOperation, new Type[0]);
     }
@@ -36,6 +43,7 @@ public final class OASMethodVisitor extends MethodVisitor {
         this.context = context;
         this.currentOperation = currentOperation;
         this.parameterTypes = new ArrayList<>(Arrays.asList(parameterTypes));
+        this.schemaMap = new HashMap<>();
     }
 
 	@Override
@@ -48,6 +56,9 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     public void visitParameter(String name, String type) {
         System.out.println("Visited endpoint parameter " + name + " of type: " + type);
+        String simpleName = getSimpleName(type);
+        SchemaImpl schema = context.getSchema(simpleName);
+        schemaMap.put(schema.getSchemaName(), schema);
     }
 
     @Override
@@ -87,6 +98,9 @@ public final class OASMethodVisitor extends MethodVisitor {
                 pathItem = new PathItemImpl();
                 context.getApi().getPaths().addPathItem(context.getPath(), pathItem);
             }
+            schemaMap.entrySet().forEach((entry) -> {
+                context.getApi().getComponents().addSchema(entry.getKey(), entry.getValue());
+            });
             switch (httpMethodName) {
                 case "javax.ws.rs.GET":
                     pathItem.GET(currentOperation); break;
