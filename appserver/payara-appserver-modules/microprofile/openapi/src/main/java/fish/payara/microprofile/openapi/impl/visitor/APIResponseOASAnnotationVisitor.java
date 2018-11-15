@@ -5,8 +5,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.microprofile.openapi.models.responses.APIResponse;
 import org.eclipse.microprofile.openapi.models.responses.APIResponses;
-import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
-import org.glassfish.pfl.objectweb.asm.Type;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Type;
 
 import fish.payara.microprofile.openapi.impl.model.media.ContentImpl;
 import fish.payara.microprofile.openapi.impl.model.responses.APIResponseImpl;
@@ -70,10 +70,10 @@ public class APIResponseOASAnnotationVisitor extends OASAnnotationVisitor {
     public void visitEnd() {
 
         if (responseCode != null) {
-            if (currentResponses.getDefault() != null) {
-                currentResponses.remove(APIResponsesImpl.DEFAULT);
+            if (currentResponses.getDefaultValue() != null) {
+                currentResponses.removeAPIResponse(APIResponsesImpl.DEFAULT);
             }
-            currentResponses.addApiResponse(responseCode, currentResponse);
+            currentResponses.addAPIResponse(responseCode, currentResponse);
         }
 
         super.visitEnd();

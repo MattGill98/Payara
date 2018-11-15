@@ -7,7 +7,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.openapi.models.responses.APIResponse;
 import org.eclipse.microprofile.openapi.models.responses.APIResponses;
-import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.AnnotationVisitor;
 
 public class ProducesOASAnnotationVisitor extends OASAnnotationVisitor {
 

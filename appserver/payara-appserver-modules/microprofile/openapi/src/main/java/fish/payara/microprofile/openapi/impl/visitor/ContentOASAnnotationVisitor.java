@@ -4,8 +4,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.microprofile.openapi.models.media.Content;
 import org.eclipse.microprofile.openapi.models.media.MediaType;
-import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
 import org.glassfish.pfl.objectweb.asm.Type;
+import org.objectweb.asm.AnnotationVisitor;
 
 import fish.payara.microprofile.openapi.impl.model.media.MediaTypeImpl;
 import fish.payara.microprofile.openapi.impl.model.media.SchemaImpl;

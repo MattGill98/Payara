@@ -37,22 +37,22 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.microprofile.openapi.resource.rule;
+package fish.payara.microprofile.openapi.resource;
 
-import fish.payara.microprofile.openapi.impl.model.OpenAPIImpl;
-import fish.payara.microprofile.openapi.impl.processor.ApplicationProcessor;
-import fish.payara.microprofile.openapi.impl.processor.BaseProcessor;
-import fish.payara.microprofile.openapi.impl.processor.FilterProcessor;
-import fish.payara.microprofile.openapi.resource.classloader.ApplicationClassLoader;
-import fish.payara.microprofile.openapi.test.app.TestApplication;
+import static java.util.Arrays.asList;
+
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashSet;
 
 import org.eclipse.microprofile.openapi.OASFilter;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.fail;
+import fish.payara.microprofile.openapi.impl.model.OpenAPIImpl;
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
+import fish.payara.microprofile.openapi.impl.processor.BaseProcessor;
+import fish.payara.microprofile.openapi.impl.processor.FilterProcessor;
 
 public class ApplicationProcessedDocument {
 
@@ -62,14 +62,16 @@ public class ApplicationProcessedDocument {
 
     public static OpenAPI createDocument(Class<? extends OASFilter> filter, Class<?>... extraClasses) {
         try {
-            ApplicationClassLoader appClassLoader = new ApplicationClassLoader(new TestApplication(), 
-                    new HashSet<>(asList(extraClasses)));
             OpenAPIImpl document = new OpenAPIImpl();
             // Apply base processor
             new BaseProcessor(asList(new URL("http://localhost:8080/testlocation_123"))).process(document, null);
 
             // Apply application processor
-            new ApplicationProcessor(appClassLoader.getApplicationClasses()).process(document, null);
+            Collection<InputStream> streams = new HashSet<>();
+            for (Class<?> clazz : extraClasses) {
+                streams.add(ApplicationProcessedDocument.class.getClassLoader().getResourceAsStream(clazz.getName().replace(".", "/") + ".class"));
+            }
+            new ASMProcessor(streams).process(document, null);
             if (filter != null) {
                 new FilterProcessor(filter.newInstance()).process(document, null);
             }

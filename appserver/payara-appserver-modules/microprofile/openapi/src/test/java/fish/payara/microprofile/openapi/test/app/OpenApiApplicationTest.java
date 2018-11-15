@@ -42,14 +42,14 @@ package fish.payara.microprofile.openapi.test.app;
 import static fish.payara.microprofile.openapi.test.util.JsonUtils.toJson;
 import static org.junit.Assert.assertNotNull;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.eclipse.microprofile.openapi.OASFilter;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import fish.payara.microprofile.openapi.resource.rule.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.resource.ApplicationProcessedDocument;
 import fish.payara.microprofile.openapi.spec.OpenApiValidator;
 
 public abstract class OpenApiApplicationTest {
