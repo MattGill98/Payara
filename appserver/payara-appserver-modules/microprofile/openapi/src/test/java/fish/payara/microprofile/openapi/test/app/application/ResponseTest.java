@@ -58,7 +58,8 @@ import org.eclipse.microprofile.openapi.models.responses.APIResponses;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fish.payara.microprofile.openapi.resource.rule.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.resource.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.test.app.TestApplication;
 
 /**
  * A resource to test that various response types are mapped properly.
@@ -72,7 +73,7 @@ public class ResponseTest {
     @BeforeClass
     public static void createDocument() {
         try {
-            document = new ApplicationProcessedDocument();
+            document = new ApplicationProcessedDocument(TestApplication.class, ResponseTest.class);
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("Failed to build document.");

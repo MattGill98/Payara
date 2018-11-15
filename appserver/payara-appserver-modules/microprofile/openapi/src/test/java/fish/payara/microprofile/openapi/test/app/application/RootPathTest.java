@@ -50,7 +50,8 @@ import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fish.payara.microprofile.openapi.resource.rule.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.resource.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.test.app.TestApplication;
 
 /**
  * A resource to test that a resource at the context root is mapped correctly.
@@ -63,7 +64,7 @@ public class RootPathTest {
     @BeforeClass
     public static void createDocument() {
         try {
-            document = new ApplicationProcessedDocument();
+            document = new ApplicationProcessedDocument(TestApplication.class, RootPathTest.class);
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("Failed to build document.");

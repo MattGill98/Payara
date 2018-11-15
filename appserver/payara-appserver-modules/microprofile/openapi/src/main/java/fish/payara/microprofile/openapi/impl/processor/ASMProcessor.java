@@ -1,7 +1,10 @@
 package fish.payara.microprofile.openapi.impl.processor;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.glassfish.api.deployment.archive.ReadableArchive;
@@ -17,9 +20,22 @@ public class ASMProcessor implements OASProcessor {
 
     public static final int ASM_VERSION = Opcodes.ASM6;
 
-    private final ReadableArchive archive;
+    private final Collection<InputStream> archive;
 
     public ASMProcessor(ReadableArchive archive) {
+        this.archive = new HashSet<>();
+        for (String entry : Collections.list(archive.entries())) {
+            if (entry.endsWith(".class")) {
+                try {
+                    this.archive.add(archive.getEntry(entry));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public ASMProcessor(Collection<InputStream> archive) {
         this.archive = archive;
     }
 
@@ -29,19 +45,16 @@ public class ASMProcessor implements OASProcessor {
         String applicationPath = null;
         OASContext context = new OASContext(api, applicationPath);
 
-        for (String entry : Collections.list(archive.entries())) {
-            if (entry.endsWith(".class")) {
-                ClassReader reader = null;
-                try {
-                    reader = new ClassReader(archive.getEntry(entry));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (reader != null) {
-                    reader.accept(new OASClassVisitor(context),
-                            ClassReader.SKIP_FRAMES);
-                    applicationPath = context.getApplicationPath();
-                }
+        for (InputStream entry : archive) {
+            ClassReader reader = null;
+            try {
+                reader = new ClassReader(entry);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (reader != null) {
+                reader.accept(new OASClassVisitor(context), ClassReader.SKIP_FRAMES);
+                applicationPath = context.getApplicationPath();
             }
         }
         return api;

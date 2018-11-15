@@ -47,7 +47,8 @@ import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fish.payara.microprofile.openapi.resource.rule.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.resource.ApplicationProcessedDocument;
+import fish.payara.microprofile.openapi.test.app.TestApplication;
 
 /**
  * A test to check that schema objects without a @Schema annotation at the top are created.
@@ -59,7 +60,7 @@ public class TestComponent {
     @BeforeClass
     public static void createDocument() {
         try {
-            document = new ApplicationProcessedDocument();
+            document = new ApplicationProcessedDocument(TestApplication.class, TestComponent.class);
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("Failed to build document.");

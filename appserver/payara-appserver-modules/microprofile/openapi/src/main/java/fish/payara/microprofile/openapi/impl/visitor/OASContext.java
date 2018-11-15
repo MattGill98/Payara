@@ -129,22 +129,27 @@ public class OASContext {
         if (urlComponents == null || urlComponents.length == 0) {
             return "";
         }
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append("/");
+        // Start with two slashes
+        String normalised = "//";
 
         if (urlComponents != null) {
+            // For each urlComponent, add the part followed by a slash
             for (String component : urlComponents) {
                 if (component != null) {
-                    urlBuilder.append(component);
+                    normalised = normalised + component + "/";
                 }
-                urlBuilder.append("/");
             }
         }
 
-        // Remove trailing slash
-        urlBuilder.deleteCharAt(urlBuilder.length() - 1);
+        // Remove duplicate slashes
+        normalised = normalised.replaceAll("/+", "/");
 
-        return urlBuilder.toString().replaceAll("/+", "/");
+        // Remove trailing slash
+        if (!"/".equals(normalised)) {
+            normalised = normalised.substring(0, normalised.length() - 1);
+        }
+
+        return normalised;
     }
 
     public static String getSimpleName(String className) {

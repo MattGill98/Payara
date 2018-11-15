@@ -37,29 +37,27 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.microprofile.openapi.resource.rule;
+package fish.payara.microprofile.openapi.resource;
+
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.HashSet;
 
 import fish.payara.microprofile.openapi.impl.model.OpenAPIImpl;
-import fish.payara.microprofile.openapi.impl.processor.ApplicationProcessor;
-import fish.payara.microprofile.openapi.impl.processor.BaseProcessor;
-import fish.payara.microprofile.openapi.resource.classloader.ApplicationClassLoader;
-import fish.payara.microprofile.openapi.test.app.TestApplication;
-import fish.payara.microprofile.openapi.test.app.data.TestComponent;
-import java.net.MalformedURLException;
-import java.net.URL;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 
 public class ApplicationProcessedDocument extends OpenAPIImpl {
 
-    public ApplicationProcessedDocument() throws MalformedURLException {
-        // Apply base processor
-        new BaseProcessor(asList(new URL("http://localhost:8080/testlocation_123"))).process(this, null);
+    public ApplicationProcessedDocument(Class<?>... classes) throws MalformedURLException {
+        Collection<InputStream> streams = new HashSet<>();
 
-        ApplicationClassLoader appClassLoader = new ApplicationClassLoader(new TestApplication(), singleton(TestComponent.class));
+        for (Class<?> clazz : classes) {
+            streams.add(getClass().getClassLoader().getResourceAsStream(clazz.getName().replace(".", "/") + ".class"));
+        }
 
         // Apply application processor
-        new ApplicationProcessor(appClassLoader.getApplicationClasses()).process(this, null);
+        new ASMProcessor(streams).process(this, null);
     }
 
 }
