@@ -42,21 +42,17 @@ public class ASMProcessor implements OASProcessor {
     @Override
     public OpenAPI process(OpenAPI api, OpenApiConfiguration config) {
 
-        String applicationPath = null;
-        OASContext context = new OASContext(api, applicationPath);
+        OASContext context = new OASContext(api);
 
         for (InputStream entry : archive) {
-            ClassReader reader = null;
             try {
-                reader = new ClassReader(entry);
+                ClassReader reader = new ClassReader(entry);
+                reader.accept(new OASClassVisitor(context), ClassReader.SKIP_FRAMES);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (reader != null) {
-                reader.accept(new OASClassVisitor(context), ClassReader.SKIP_FRAMES);
-                applicationPath = context.getApplicationPath();
-            }
         }
+
         return api;
     }
 
