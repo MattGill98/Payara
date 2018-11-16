@@ -55,32 +55,38 @@ public class OASContext {
     private final OpenAPI openapi;
 
     // Variables for constructing the path
-    private String applicationPath = "/";
+    private String applicationPath;
     private String classPath;
     private String resourcePath;
 
     private Map<String, SchemaImpl> schemaMap;
 
     public OASContext(OpenAPI openapi) {
-        this(openapi, null);
-    }
-
-    public OASContext(OpenAPI openapi, String applicationPath) {
         this.openapi = openapi;
         this.classPath = null;
         this.resourcePath = null;
-        this.applicationPath = applicationPath;
+        this.applicationPath = "/";
         this.schemaMap = new HashMap<>();
     }
 
+    /**
+     * @return the OpenAPI document currently being built.
+     */
     public OpenAPI getApi() {
         return openapi;
     }
 
+    /**
+     * @return the path of the current method.
+     */
     public String getPath() {
         return normaliseUrl(applicationPath, classPath, resourcePath);
     }
 
+    /**
+     * @param path The path segment to add. This could be for a class or method level annotation.
+     * @param method whether the annotation is on a method or not.
+     */
     public void addPathSegment(String path, boolean method) {
         if (method) {
             this.resourcePath = path;
@@ -89,17 +95,11 @@ public class OASContext {
         }
     }
 
-    public String getApplicationPath() {
-        return applicationPath;
-    }
-
     public void setApplicationPath(String applicationPath) {
-        if (this.applicationPath == null) {
-            this.applicationPath = applicationPath;
-            for (String path : new LinkedList<>(openapi.getPaths().keySet())) {
-                PathItem moved = openapi.getPaths().remove(path);
-                openapi.getPaths().addPathItem(normaliseUrl(applicationPath, path), moved);
-            }
+        this.applicationPath = applicationPath;
+        for (String path : new LinkedList<>(openapi.getPaths().keySet())) {
+            PathItem moved = openapi.getPaths().remove(path);
+            openapi.getPaths().addPathItem(normaliseUrl(applicationPath, path), moved);
         }
     }
 
