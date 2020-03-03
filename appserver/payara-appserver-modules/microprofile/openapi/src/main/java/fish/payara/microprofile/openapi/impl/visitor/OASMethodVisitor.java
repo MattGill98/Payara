@@ -44,6 +44,7 @@ public final class OASMethodVisitor extends MethodVisitor {
         this.context = context;
         this.currentOperation = currentOperation;
         this.parameterCount = parameterCount;
+        context.setResourcePath(null);
     }
 
 	@Override
@@ -113,7 +114,7 @@ public final class OASMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitEnd() {
-        if (context.isOperationValid(httpMethodName != null)) {
+        if (httpMethodName != null && context.isOperationValid()) {
             LOGGER.log(Level.INFO, "Operation found at path: " + context.getPath());
             PathItem pathItem = context.getApi().getPaths().getPathItem(context.getPath());
             if (pathItem == null) {

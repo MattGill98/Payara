@@ -83,28 +83,25 @@ public class OASContext {
         return normaliseUrl(applicationPath, classPath, resourcePath);
     }
 
-    /**
-     * @param path The path segment to add. This could be for a class or method level annotation.
-     * @param method whether the annotation is on a method or not.
-     */
-    public void addPathSegment(String path, boolean method) {
-        if (method) {
-            this.resourcePath = path;
-        } else {
-            this.classPath = path;
-        }
-    }
-
     public void setApplicationPath(String applicationPath) {
         this.applicationPath = applicationPath;
         for (String path : new LinkedList<>(openapi.getPaths().keySet())) {
-            PathItem moved = openapi.getPaths().remove(path);
+            PathItem moved = openapi.getPaths().getPathItem(path);
+            openapi.getPaths().removePathItem(path);
             openapi.getPaths().addPathItem(normaliseUrl(applicationPath, path), moved);
         }
     }
 
-    public boolean isOperationValid(boolean validMethod) {
-        return validMethod && classPath != null;
+    public void setClassPath(String classPath) {
+        this.classPath = classPath;
+    }
+
+    public void setResourcePath(String resourcePath) {
+        this.resourcePath = resourcePath;
+    }
+
+    public boolean isOperationValid() {
+        return classPath != null;
     }
 
     public boolean containsSchema(String className) {

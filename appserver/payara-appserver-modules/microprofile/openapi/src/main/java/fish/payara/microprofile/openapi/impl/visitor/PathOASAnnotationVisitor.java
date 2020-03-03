@@ -6,11 +6,11 @@ public class PathOASAnnotationVisitor extends OASAnnotationVisitor {
 
     private static final Logger LOGGER = Logger.getLogger(PathOASAnnotationVisitor.class.getName());
 
-    private final boolean method;
+    private final boolean isMethodAnnotation;
 
-    public PathOASAnnotationVisitor(OASContext context, boolean method) {
+    public PathOASAnnotationVisitor(OASContext context, boolean isMethodAnnotation) {
         super(context);
-        this.method = method;
+        this.isMethodAnnotation = isMethodAnnotation;
     }
 
     @Override
@@ -18,7 +18,11 @@ public class PathOASAnnotationVisitor extends OASAnnotationVisitor {
         if (name != null) {
             switch (name) {
                 case "value":
-                    context.addPathSegment((String) value, method);
+                    if (isMethodAnnotation) {
+                        context.setResourcePath(value.toString());
+                    } else {
+                        context.setClassPath(value.toString());
+                    }
                     break;
                 default:
                     LOGGER.info(String.format("Unrecognised property: '%s'.", name));
