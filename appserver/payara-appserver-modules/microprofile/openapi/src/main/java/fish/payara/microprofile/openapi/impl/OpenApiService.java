@@ -286,7 +286,7 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
         }
 
         private synchronized OpenAPI getDocument() throws OpenAPIBuildException {
-            if (document == null) {
+            if (document == null || test) {
                 document = buildDocument();
             }
             return document;
