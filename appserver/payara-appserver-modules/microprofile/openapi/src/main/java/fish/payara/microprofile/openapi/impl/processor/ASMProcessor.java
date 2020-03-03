@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.glassfish.api.deployment.archive.ReadableArchive;
-import org.glassfish.hk2.external.org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassReader;
 
 import fish.payara.microprofile.openapi.api.processor.OASProcessor;
 import fish.payara.microprofile.openapi.impl.config.OpenApiConfiguration;

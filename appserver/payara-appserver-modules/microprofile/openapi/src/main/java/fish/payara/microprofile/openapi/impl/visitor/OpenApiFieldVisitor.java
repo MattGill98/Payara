@@ -1,8 +1,8 @@
 package fish.payara.microprofile.openapi.impl.visitor;
 
-import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.FieldVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Opcodes;
 
 public final class OpenApiFieldVisitor extends FieldVisitor {
 

@@ -44,6 +44,7 @@ import fish.payara.microprofile.openapi.api.OpenAPIBuildException;
 import fish.payara.microprofile.openapi.impl.admin.OpenApiServiceConfiguration;
 import fish.payara.microprofile.openapi.impl.config.OpenApiConfiguration;
 import fish.payara.microprofile.openapi.impl.model.OpenAPIImpl;
+import fish.payara.microprofile.openapi.impl.processor.ASMProcessor;
 import fish.payara.microprofile.openapi.impl.processor.ApplicationProcessor;
 import fish.payara.microprofile.openapi.impl.processor.BaseProcessor;
 import fish.payara.microprofile.openapi.impl.processor.FileProcessor;

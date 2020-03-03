@@ -3,9 +3,9 @@ package fish.payara.microprofile.openapi.impl.visitor;
 import static fish.payara.microprofile.openapi.impl.visitor.VisitorContext.getClassName;
 
 import org.eclipse.microprofile.openapi.models.PathItem;
-import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import fish.payara.microprofile.openapi.impl.model.PathItemImpl;
 

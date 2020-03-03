@@ -125,8 +125,4 @@ public class OpenApiResource {
         // Return the document
         return Response.ok(document).build();
     }
-
-    private Response handleDocument(OpenAPI document) {
-        
-    }
 }

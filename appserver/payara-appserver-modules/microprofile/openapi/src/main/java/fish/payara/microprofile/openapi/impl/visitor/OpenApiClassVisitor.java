@@ -8,11 +8,11 @@ import java.util.logging.Logger;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
 
-import org.glassfish.hk2.external.org.objectweb.asm.AnnotationVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.ClassVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.FieldVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.MethodVisitor;
-import org.glassfish.hk2.external.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 public final class OpenApiClassVisitor extends ClassVisitor {
 
