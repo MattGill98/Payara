@@ -97,6 +97,7 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
     private static final Logger LOGGER = Logger.getLogger(OpenApiService.class.getName());
 
     private Deque<OpenApiMapping> mappings;
+    private Deque<OpenApiMapping> newMappings;
 
     @Inject
     private Events events;
@@ -113,6 +114,7 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
     @Override
     public void postConstruct() {
         mappings = new ConcurrentLinkedDeque<>();
+        newMappings = new ConcurrentLinkedDeque<>();
         events.register(this);
     }
 
@@ -167,7 +169,8 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
             // Create all the relevant resources
             if (isValidApp(appInfo)) {
                 // Store the application mapping in the list
-                mappings.add(new OpenApiMapping(appInfo));
+                mappings.add(new OpenApiMapping(appInfo, false));
+                newMappings.add(new OpenApiMapping(appInfo, true));
             }
         } else if (event.is(Deployment.APPLICATION_UNLOADED)) {
             ApplicationInfo appInfo = (ApplicationInfo) event.hook();
@@ -190,6 +193,13 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
             return null;
         }
         return mappings.peekLast().getDocument();
+    }
+
+    public OpenAPI getTestDocument() throws OpenAPIBuildException {
+        if (newMappings.isEmpty() || !isEnabled()) {
+            return null;
+        }
+        return newMappings.peekLast().getDocument();
     }
 
     /**
@@ -262,9 +272,12 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
         private final OpenApiConfiguration appConfig;
         private volatile OpenAPI document;
 
-        OpenApiMapping(ApplicationInfo appInfo) {
+        private boolean test;
+
+        OpenApiMapping(ApplicationInfo appInfo, boolean test) {
             this.appInfo = appInfo;
             this.appConfig = new OpenApiConfiguration(appInfo.getAppClassLoader());
+            this.test = test;
         }
 
         ApplicationInfo getAppInfo() {
@@ -289,7 +302,11 @@ public class OpenApiService implements PostConstruct, PreDestroy, EventListener,
 
                 openapi = new ModelReaderProcessor().process(openapi, appConfig);
                 openapi = new FileProcessor(appInfo.getAppClassLoader()).process(openapi, appConfig);
-                openapi = new ApplicationProcessor(classes).process(openapi, appConfig);
+                if (test) {
+                    openapi = new ASMProcessor(archive).process(openapi, appConfig);
+                } else {
+                    openapi = new ApplicationProcessor(classes).process(openapi, appConfig);
+                }
                 openapi = new BaseProcessor(baseURLs).process(openapi, appConfig);
                 openapi = new FilterProcessor().process(openapi, appConfig);
             } catch (Throwable t) {
