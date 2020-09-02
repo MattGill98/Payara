@@ -130,6 +130,7 @@
             <type>zip</type>
             <optional>true</optional>
         </dependency>
+	<!--
         <dependency>
            <groupId>fish.payara.server.internal.admingui</groupId>
            <artifactId>eventbus-notifier-console-plugin</artifactId>
@@ -142,6 +143,7 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+	-->
     </dependencies>
 </project>
 

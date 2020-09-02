@@ -81,7 +81,7 @@ public class TestDatadogNotifier extends TestNotifier {
     private static final String MESSAGE = "Datadog notifier test";
     
     @Param(name = "key", optional = true)
-     private String key;
+    private String key;
 
     @Inject
     DatadogNotificationEventFactory factory;
@@ -101,7 +101,7 @@ public class TestDatadogNotifier extends TestNotifier {
         DatadogNotifierConfiguration datadogConfig = config.getExtensionByType(DatadogNotifierConfiguration.class);
         
         if (key == null){
-                key = datadogConfig.getKey();
+            key = datadogConfig.getKey();
         }
         //prepare Datadog message
         DatadogNotificationEvent event = factory.buildNotificationEvent(SUBJECT, MESSAGE);

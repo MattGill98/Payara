@@ -41,12 +41,24 @@
 
 package fish.payara.nucleus.notification.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.inject.Inject;
+
 import com.sun.enterprise.config.serverbeans.Domain;
 import com.sun.enterprise.util.LocalStringManagerImpl;
-import fish.payara.nucleus.notification.service.BaseNotifierService;
+
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.I18n;
-import org.glassfish.api.admin.*;
+import org.glassfish.api.admin.AdminCommand;
+import org.glassfish.api.admin.AdminCommandContext;
+import org.glassfish.api.admin.CommandLock;
+import org.glassfish.api.admin.ExecuteOn;
+import org.glassfish.api.admin.RestEndpoint;
+import org.glassfish.api.admin.RestEndpoints;
+import org.glassfish.api.admin.RuntimeType;
 import org.glassfish.config.support.CommandTarget;
 import org.glassfish.config.support.TargetType;
 import org.glassfish.hk2.api.PerLookup;
@@ -54,10 +66,7 @@ import org.glassfish.hk2.api.ServiceHandle;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.jvnet.hk2.annotations.Service;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import fish.payara.notification.PayaraNotifier;
 
 
 /**
@@ -80,12 +89,12 @@ public class NotifierServiceLister implements AdminCommand {
     final private static LocalStringManagerImpl strings = new LocalStringManagerImpl(NotifierServiceLister.class);
 
     @Inject
-    ServiceLocator habitat;
+    private ServiceLocator habitat;
 
     @Override
     public void execute(AdminCommandContext context) {
         final ActionReport report = context.getActionReport();
-        List<ServiceHandle<BaseNotifierService>> allServiceHandles = habitat.getAllServiceHandles(BaseNotifierService.class);
+        List<ServiceHandle<PayaraNotifier>> allServiceHandles = habitat.getAllServiceHandles(PayaraNotifier.class);
 
         if (allServiceHandles.isEmpty()) {
 
@@ -99,7 +108,7 @@ public class NotifierServiceLister implements AdminCommand {
 
             Properties extrasProps = new Properties();
             ArrayList<String> names = new ArrayList<String>();
-            for (ServiceHandle serviceHandle : allServiceHandles) {
+            for (ServiceHandle<?> serviceHandle : allServiceHandles) {
                 sb.append("\t" + serviceHandle.getActiveDescriptor().getName() + "\n");
                 names.add(serviceHandle.getActiveDescriptor().getName());
             }

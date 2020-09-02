@@ -37,12 +37,12 @@
  */
 package fish.payara.nucleus.notification.admin;
 
-import com.sun.enterprise.config.serverbeans.Domain;
-import com.sun.enterprise.util.SystemPropertyConstants;
 import java.util.Properties;
+
 import javax.inject.Inject;
 
-import fish.payara.nucleus.notification.configuration.NotificationServiceConfiguration;
+import com.sun.enterprise.util.SystemPropertyConstants;
+
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.I18n;
 import org.glassfish.api.Param;
@@ -60,6 +60,8 @@ import org.glassfish.config.support.TargetType;
 import org.glassfish.hk2.api.PerLookup;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.notification.admin.NotificationServiceConfiguration;
 
 /**
  * Admin command to set notification services configuration

@@ -64,7 +64,7 @@ public class DatadogNotifierService extends QueueBasedNotifierService<DatadogNot
 
     DatadogNotifierService() {
         super("datadog-message-consumer-");
-}
+    }
 
     @Override
     public void handleNotification(@SubscribeTo NotificationEvent event) {

@@ -39,21 +39,22 @@
  */
 package fish.payara.nucleus.notification.domain;
 
-import com.sun.enterprise.config.serverbeans.Server;
-import fish.payara.notification.healthcheck.HealthCheckResultEntry;
-import fish.payara.notification.requesttracing.RequestTrace;
-import fish.payara.nucleus.notification.configuration.NotifierType;
-import fish.payara.nucleus.notification.service.NotificationEventFactoryStore;
-import org.glassfish.api.admin.ServerEnvironment;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.jvnet.hk2.annotations.Contract;
-
-import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.logging.Level;
+
+import javax.inject.Inject;
+
+import com.sun.enterprise.config.serverbeans.Server;
+
+import org.glassfish.api.admin.ServerEnvironment;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.jvnet.hk2.annotations.Contract;
+
+import fish.payara.notification.healthcheck.HealthCheckResultEntry;
+import fish.payara.notification.requesttracing.RequestTrace;
 
 /**
  * Factory for building {@link NotificationEvent}
@@ -64,17 +65,10 @@ import java.util.logging.Level;
 public abstract class NotificationEventFactory<E extends NotificationEvent> {
 
     @Inject
-    NotificationEventFactoryStore store;
-
-    @Inject
     private ServerEnvironment environment;
 
     @Inject
     private ServiceLocator habitat;
-
-    protected void registerEventFactory(NotifierType type, NotificationEventFactory notificationEventFactory) {
-        getStore().register(type, notificationEventFactory);
-    }
 
     protected E initializeEvent(E e) {
         try {
@@ -143,10 +137,6 @@ public abstract class NotificationEventFactory<E extends NotificationEvent> {
         }
         event.setMessage(message);
         return event;
-    }
-
-    public NotificationEventFactoryStore getStore() {
-        return store;
     }
 
     protected String getSubject(Level level) {

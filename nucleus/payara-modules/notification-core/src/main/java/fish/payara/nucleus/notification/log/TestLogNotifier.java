@@ -39,14 +39,14 @@
  */
 package fish.payara.nucleus.notification.log;
 
-import com.sun.enterprise.config.serverbeans.Config;
-import fish.payara.nucleus.notification.BlockingQueueHandler;
-import fish.payara.nucleus.notification.TestNotifier;
-import fish.payara.nucleus.notification.configuration.NotificationServiceConfiguration;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
+
+import com.sun.enterprise.config.serverbeans.Config;
+
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.Param;
 import org.glassfish.api.admin.AdminCommandContext;
@@ -59,6 +59,11 @@ import org.glassfish.config.support.CommandTarget;
 import org.glassfish.config.support.TargetType;
 import org.glassfish.hk2.api.PerLookup;
 import org.jvnet.hk2.annotations.Service;
+
+import fish.payara.notification.admin.NotificationServiceConfiguration;
+import fish.payara.nucleus.notification.BlockingQueueHandler;
+import fish.payara.nucleus.notification.TestNotifier;
+import fish.payara.nucleus.notification.domain.NotificationEventFactory;
 
 /**
  * Tests that the log notifier works
@@ -84,60 +89,24 @@ public class TestLogNotifier extends TestNotifier {
     private Boolean useSeparateLogFile;
 
     @Inject
-    LogNotificationEventFactory factory;
+    private LogNotifier notifier;
+
+    @Inject
+    private NotificationEventFactory<?> notificationFactory;
     
     @Override
     public void execute(AdminCommandContext context) {
         
-        ActionReport actionReport = context.getActionReport();
+        final ActionReport report = context.getActionReport();
         
-        Config config = targetUtil.getConfig(target);
-        if (config == null) {
-            context.getActionReport().setMessage("No such config named: " + target);
-            context.getActionReport().setActionExitCode(ActionReport.ExitCode.FAILURE);
-            return;
+        try {
+            notifier.handleNotification(notificationFactory.buildNotificationEvent(MESSAGE, MESSAGE));
+            report.setMessage("SUCCESS");
+            report.setActionExitCode(ActionReport.ExitCode.SUCCESS);
+        } catch (Exception ex) {
+            report.setMessage(ex.getMessage());
+            report.setFailureCause(ex);
+            report.setActionExitCode(ActionReport.ExitCode.FAILURE);
         }
-        
-        LogNotifierConfiguration logConfig = config.getExtensionByType(LogNotifierConfiguration.class);
-        
-        if (useSeparateLogFile == null){
-                useSeparateLogFile = Boolean.parseBoolean(logConfig.getUseSeparateLogFile());
-        }
-        //prepare log message
-        LogNotificationEvent event = factory.buildNotificationEvent(SUBJECT, MESSAGE);
-        event.setLevel(Level.FINE);
-        LogNotifierConfigurationExecutionOptions options = new LogNotifierConfigurationExecutionOptions();
-        options.setUseSeparateLogFile(useSeparateLogFile);
-        options.setEnabled(true);
-        
-        //set up logger to store result
-        LogNotifierService service = new LogNotifierService();
-        service.execOptions = options;
-        Logger logger = Logger.getLogger(LogNotifierService.class.getCanonicalName());
-        BlockingQueueHandler bqh = new BlockingQueueHandler(10);
-        bqh.setLevel(Level.FINE);
-        Level oldLevel = logger.getLevel();
-        logger.setLevel(Level.FINE);
-        logger.addHandler(bqh);
-        service.handleNotification(event);
-
-        logger.setLevel(oldLevel);
-        LogRecord message = bqh.poll();
-        logger.removeHandler(bqh);
-        if (message == null){
-            //something's gone wrong
-            Logger.getLogger(TestLogNotifier.class.getCanonicalName()).log(Level.SEVERE, "Failed to send Log message");
-            actionReport.setMessage("Failed to send Log message");
-            actionReport.setActionExitCode(ActionReport.ExitCode.FAILURE);
-        } else {;
-            actionReport.setMessage(message.getMessage());
-            if (message.getLevel()==Level.FINE){
-                actionReport.setActionExitCode(ActionReport.ExitCode.SUCCESS);               
-            } else {
-                actionReport.setActionExitCode(ActionReport.ExitCode.FAILURE);
-            }
-
-        }
-        
     }
 }

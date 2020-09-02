@@ -64,8 +64,8 @@ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
         <module>notification-core</module>
         <module>asadmin-recorder</module>
         <module>service-exemplar</module>
-        <module>notification-eventbus-core</module>
-        <module>notification-cdi-eventbus-core</module>
+		<!--<module>notification-eventbus-core</module>-->
+		<!--<module>notification-cdi-eventbus-core</module>-->
         <module>jsr107-repackaged</module>
         <module>payara-executor-service</module>
         <module>opentracing-adapter</module>

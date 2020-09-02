@@ -58,6 +58,7 @@
         <module>payara-micro-service</module>
         <module>payara-micro-cdi</module>
         <module>jaspic-servlet-utils</module>
+	<!--
         <module>notification-jms-core</module>
         <module>notification-hipchat-core</module>
         <module>notification-slack-core</module>
@@ -66,6 +67,7 @@
         <module>notification-snmp-core</module>
         <module>notification-newrelic-core</module>
         <module>notification-datadog-core</module>
+	-->
         <module>zendesk-support</module>
         <module>environment-warning</module>
         <module>payara-rest-endpoints</module>

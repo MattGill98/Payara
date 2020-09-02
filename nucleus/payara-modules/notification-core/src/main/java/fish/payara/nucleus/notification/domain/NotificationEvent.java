@@ -38,12 +38,14 @@
  */
 package fish.payara.nucleus.notification.domain;
 
+import fish.payara.notification.PayaraNotification;
+
 /**
  * Base class for notification events.
  *
  * @author mertcaliskan
  */
-public abstract class NotificationEvent {
+public abstract class NotificationEvent implements PayaraNotification {
 
     private String eventType;
     private String serverName;
@@ -53,6 +55,7 @@ public abstract class NotificationEvent {
     private String subject;
     private String message;
 
+    @Override
     public String getEventType() {
         return eventType;
     }
@@ -61,6 +64,7 @@ public abstract class NotificationEvent {
         this.eventType = eventType;
     }
 
+    @Override
     public String getServerName() {
         return serverName;
     }
@@ -69,6 +73,7 @@ public abstract class NotificationEvent {
         this.serverName = serverName;
     }
 
+    @Override
     public String getHostName() {
         return hostName;
     }
@@ -77,6 +82,7 @@ public abstract class NotificationEvent {
         this.hostName = hostName;
     }
 
+    @Override
     public String getDomainName() {
         return domainName;
     }
@@ -85,6 +91,7 @@ public abstract class NotificationEvent {
         this.domainName = domainName;
     }
 
+    @Override
     public String getInstanceName() {
         return instanceName;
     }
@@ -93,6 +100,7 @@ public abstract class NotificationEvent {
         this.instanceName = instanceName;
     }
 
+    @Override
     public String getSubject() {
         return subject;
     }
@@ -101,6 +109,7 @@ public abstract class NotificationEvent {
         this.subject = subject;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

@@ -139,6 +139,7 @@
         <module>payara-console-extras</module>
         <module>payara-console-extras-l10n</module>
         <module>payara-support</module>
+	<!--
         <module>slack-notifier-console-plugin</module>
         <module>slack-notifier-console-plugin-l10n</module>
         <module>hipchat-notifier-console-plugin</module>
@@ -161,6 +162,7 @@
         <module>healthcheck-service-console-plugin-l10n</module>
         <module>newrelic-notifier-console-plugin</module>
         <module>newrelic-notifier-console-plugin-l10n</module>
+	-->
         <module>jmx-monitoring-plugin</module>
         <module>jmx-monitoring-plugin-l10n</module>
         <module>rest-monitoring-plugin</module>
